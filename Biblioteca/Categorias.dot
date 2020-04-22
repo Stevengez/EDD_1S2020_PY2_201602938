@@ -1,0 +1,35 @@
+digraph arbolAVL{
+rankdir=TB;
+layout=dot;
+Matematica[label="Matematica"];
+Matematica -> Ciencia_Ficcion;
+Matematica -> Romance;
+Ciencia_Ficcion[label="Ciencia Ficcion"];
+Ciencia_Ficcion -> Biologia;
+Ciencia_Ficcion -> Fisica_Nuclear;
+Biologia[label="Biologia"];
+Biologia -> Aventura;
+Biologia -> Ciencia;
+Aventura[label="Aventura"];
+Ciencia[label="Ciencia"];
+Ciencia -> Calculo_Diferencial;
+Calculo_Diferencial[label="Calculo Diferencial"];
+Fisica_Nuclear[label="Fisica Nuclear"];
+Fisica_Nuclear -> Drama;
+Fisica_Nuclear -> Fisica_TermoNuclear;
+Drama[label="Drama"];
+Fisica_TermoNuclear[label="Fisica TermoNuclear"];
+Fisica_TermoNuclear -> Fisioterapia;
+Fisioterapia[label="Fisioterapia"];
+Romance[label="Romance"];
+Romance -> Quimica;
+Romance -> Terror;
+Quimica[label="Quimica"];
+Quimica -> Quimica_Avanzada_Volumen_3;
+Quimica_Avanzada_Volumen_3[label="Quimica Avanzada Volumen 3"];
+Terror[label="Terror"];
+Terror -> Suspenso;
+Terror -> Thriller;
+Suspenso[label="Suspenso"];
+Thriller[label="Thriller"];
+}
