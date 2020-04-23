@@ -13,19 +13,28 @@ import biblioteca.*;
  */
 public class NodoAVL {
     private int bFact, SubLevels;
-    private NodoAVL Izquierda, Derecha;
+    private NodoAVL Izquierda, Derecha, Padre;
     private Categoria Data;
     private boolean isLevelCreator, isLevelDestructor, Eliminado;
     
     public NodoAVL(Categoria Data){
         this.bFact = 0;
         this.SubLevels = 0;
+        this.Padre = null;
         this.Izquierda = null;
         this.Derecha = null;
         this.Data = Data;
         this.isLevelCreator = false;
         this.isLevelDestructor = false;
         this.Eliminado = false;
+    }
+    
+    public void setPadre(NodoAVL Padre){
+        this.Padre = Padre;
+    }
+    
+    public NodoAVL getPadre(){
+        return this.Padre;
     }
     
     public void setEliminado(boolean Eliminado){

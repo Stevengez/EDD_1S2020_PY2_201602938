@@ -50,9 +50,7 @@ public class ArbolAVL {
         }
     }
 
-    
     /* ---------------- INSERCION DE NUEVOS NODOS ---------------- */
-    
     private NodoAVL Insert(NodoAVL Padre, Categoria Data) {
         int comparacion = Padre.getData().getNombre().compareToIgnoreCase(Data.getNombre());
 
@@ -65,6 +63,7 @@ public class ArbolAVL {
                 }
                 //System.out.println("Colocando "+nuevo.getData().getNombre()+" a la Derecha de: "+Padre.getData().getNombre());
                 Padre.setDerecha(nuevo);
+                nuevo.setPadre(Padre);
                 return nuevo;
             } else {
                 NodoAVL temp = Insert(Padre.getDerecha(), Data);
@@ -81,6 +80,7 @@ public class ArbolAVL {
                     Padre.AddSubLevel();
                 }
                 Padre.setIzquierda(nuevo);
+                nuevo.setPadre(Padre);
                 return nuevo;
             } else {
                 NodoAVL temp = Insert(Padre.getIzquierda(), Data);
@@ -93,7 +93,7 @@ public class ArbolAVL {
             return null;
         }
     }
-    
+
     public void UpdateSubLevels(NodoAVL Nodo) {
         if (Nodo != null) {
             if (Nodo.getIzquierda() != null && Nodo.getDerecha() != null) {
@@ -136,23 +136,22 @@ public class ArbolAVL {
             }
         }
     }
-    
-    /* ---------------- BUSQUEDA DE NODOS ---------------- */
 
+    /* ---------------- BUSQUEDA DE NODOS ---------------- */
     public NodoAVL BuscarNodo(String Categoria) {
-        if(this.Raiz==null){
+        if (this.Raiz == null) {
             return null;
-        }else{
+        } else {
             NodoAVL temp = Buscar(Raiz, new Categoria(Categoria));
-            if(temp==null){
+            if (temp == null) {
                 System.out.println("No se encontro esa categoria.");
             }
             return temp;
         }
-        
+
     }
-    
-    private NodoAVL Buscar(NodoAVL Padre, Categoria Data){
+
+    private NodoAVL Buscar(NodoAVL Padre, Categoria Data) {
         int comparacion = Padre.getData().getNombre().compareToIgnoreCase(Data.getNombre());
 
         if (comparacion < 0) {
@@ -170,21 +169,34 @@ public class ArbolAVL {
         } else {
             return Padre;
         }
-        
     }
 
-    
     /* ---------------- ELIMINACION DE NODOS ---------------- */
-    
-    public void EliminarNodo(String Categoria){
-        NodoAVL temp = Eliminar(this.Raiz, new Categoria(Categoria));
-        if(temp==null){
-            
+    private NodoAVL MenordeMayores(NodoAVL Padre) {
+        if (Padre.getIzquierda() != null) {
+            return MenordeMayores(Padre.getIzquierda());
+        } else {
+            return Padre;
         }
-        
     }
-    
-    public NodoAVL Eliminar(NodoAVL Padre, Categoria Data){
+
+    private NodoAVL MayordeMenores(NodoAVL Padre) {
+        if (Padre.getDerecha() != null) {
+            return MayordeMenores(Padre.getDerecha());
+        } else {
+            return Padre;
+        }
+    }
+
+    public void EliminarNodo(String Categoria) {
+        NodoAVL temp = Eliminar(this.Raiz, new Categoria(Categoria));
+        if (temp == null) {
+
+        }
+
+    }
+
+    public NodoAVL Eliminar(NodoAVL Padre, Categoria Data) {
         int comparacion = Padre.getData().getNombre().compareToIgnoreCase(Data.getNombre());
 
         if (comparacion < 0) {
@@ -192,7 +204,16 @@ public class ArbolAVL {
                 System.out.println("No Encontre el nodo a eliminar");
                 return null;
             } else {
-                return Eliminar(Padre.getDerecha(), Data);
+                NodoAVL temp = Eliminar(Padre.getDerecha(), Data);
+                if (temp != null && temp.isDeleted()) {
+                    temp.setEliminado(false);
+                    Padre.removeSubLevel();
+                    Padre.setDerecha(null);
+                }
+                UpdateSubLevels(Padre);
+                setBFact(Padre);
+                Balanceo(Padre);
+                return temp;
             }
         } else if (comparacion > 0) {
             if (Padre.getIzquierda() == null) {
@@ -200,40 +221,171 @@ public class ArbolAVL {
                 return null;
             } else {
                 NodoAVL temp = Eliminar(Padre.getIzquierda(), Data);
-                if(temp.isDeleted()){
-                    
+                if (temp != null && temp.isDeleted()) {
+                    temp.setEliminado(false);
+                    Padre.removeSubLevel();
+                    Padre.setIzquierda(null);
                 }
+                UpdateSubLevels(Padre);
+                setBFact(Padre);
+                Balanceo(Padre);
                 return temp;
             }
         } else {
             System.out.println("Encontre el nodo a eliminar");
             NodoAVL temp = Padre;
-            if(Padre.getIzquierda()==null && Padre.getDerecha()==null){
+            if (Padre.getIzquierda() == null && Padre.getDerecha() == null) {
                 Padre.setEliminado(true);
-                System.out.println("Eliminacion Simple, era Hoja.");
+                if (Padre == this.Raiz) {
+                    this.Raiz = null;
+                    System.out.println("Caso especial, Eliminacion de la Raiz");
+                }
+                System.out.println("Eliminacion Simple.");
+                return Padre;
+            } else {
+                /* Caso en que Tiene 2 Hijos */
+                if (Padre.getIzquierda() != null && Padre.getDerecha() != null) {
+                    if (Padre.getIzquierda().getSubLevels() > Padre.getDerecha().getSubLevels()) {
+                        /* Si El hijo izquierdo tiene mas subniveles */
+                        NodoAVL Hijo = MenordeMayores(Padre.getDerecha());
+                        Categoria PadreData = Padre.getData();
+                        Categoria HijoData = Hijo.getData();
+
+                        Padre.setData(HijoData);
+                        Hijo.setData(PadreData);
+
+                        if (Hijo.getSubLevels() > 0) {
+                            EHD(Hijo.getPadre().getIzquierda());
+                        } else {
+                            if (Hijo.getPadre() == Padre) {
+                                ESD(Hijo);
+                            } else {
+                                ESI(Hijo);
+                            }
+                        }
+
+                        UpdateSubLevels(Hijo.getPadre());
+                        setBFact(Hijo.getPadre());
+                        Balanceo(Hijo.getPadre());
+                        System.out.println("Eliminacion con Intercambio doble (MenordeMayores).");
+                        return Hijo;
+                    } else {
+                        /* Si El hijo derecho tiene mas subniveles o son iguales */
+                        NodoAVL Hijo = MayordeMenores(Padre.getIzquierda());
+                        Categoria PadreData = Padre.getData();
+                        Categoria HijoData = Hijo.getData();
+
+                        Padre.setData(HijoData);
+                        Hijo.setData(PadreData);
+
+                        if (Hijo.getSubLevels() > 0) {
+                            EHI(Hijo.getPadre().getDerecha());
+                        } else {
+                            if (Hijo.getPadre() == Padre) {
+                                ESI(Hijo);
+                            } else {
+                                ESD(Hijo);
+                            }
+                        }
+
+                        UpdateSubLevels(Hijo.getPadre());
+                        setBFact(Hijo.getPadre());
+                        Balanceo(Hijo.getPadre());
+                        System.out.println("Eliminacion con Intercambio doble (MayordeMenores).");
+                        return Hijo;
+                    }
+                    /* Solo tiene un hijo */
+                } else if (Padre.getIzquierda() != null) {
+                    System.out.println("Eliminacion con Intercambio Simple.");
+                    return EHI(Padre);
+                } else if (Padre.getDerecha() != null) {
+                    System.out.println("Eliminacion con Intercambio Simple.");
+                    return EHD(Padre);
+                } else {
+                    System.out.println("Erro en la eliminacion.");
+                    return null;
+                }
             }
-            return null;
         }
     }
 
+    /* Eliminacion Simple de una Hoja */
+    public NodoAVL ESD(NodoAVL Hoja) {
+        Hoja.getPadre().removeSubLevel();
+        Hoja.getPadre().setDerecha(null);
+        return null;
+    }
+
+    public NodoAVL ESI(NodoAVL Hoja) {
+        Hoja.getPadre().removeSubLevel();
+        Hoja.getPadre().setIzquierda(null);
+        return null;
+    }
+
+
+    /* Eliminar Intercambiando con el Hijo Derecho */
+    public NodoAVL EHD(NodoAVL Padre) {
+        NodoAVL tempPadre = Padre;
+        NodoAVL tempHijo = Padre.getDerecha();
+
+        /* Intercambiar Data */
+        Categoria catPadre = tempPadre.getData();
+        Categoria catHijo = tempHijo.getData();
+
+        tempPadre.setData(catHijo);
+        tempHijo.setData(catPadre);
+
+        /* Reconectar Nodos */
+        tempPadre.setIzquierda(tempHijo.getIzquierda());
+        tempPadre.setDerecha(tempHijo.getDerecha());
+
+        /* Re Balancear */
+        tempPadre.removeSubLevel();
+        setBFact(tempPadre);
+        Balanceo(tempPadre);
+        return tempHijo;
+    }
+
+    /* Eliminar Intercambiando con el Hijo Izquierdo */
+    public NodoAVL EHI(NodoAVL Padre) {
+        NodoAVL tempPadre = Padre;
+        NodoAVL tempHijo = Padre.getIzquierda();
+
+        /* Intercambiar Data */
+        Categoria catPadre = tempPadre.getData();
+        Categoria catHijo = tempHijo.getData();
+
+        tempPadre.setData(catHijo);
+        tempHijo.setData(catPadre);
+
+        /* Reconectar Nodos */
+        tempPadre.setIzquierda(tempHijo.getIzquierda());
+        tempPadre.setDerecha(tempHijo.getDerecha());
+
+        /* Re Balancear */
+        tempPadre.removeSubLevel();
+        setBFact(tempPadre);
+        Balanceo(tempPadre);
+        return tempHijo;
+    }
+
     /* ---------------- BALANCEO y ROTACIONES ---------------- */
-    
     public void Balanceo(NodoAVL Nodo) {
         if (Nodo != null) {
             if (Nodo.getBFact() > 1) {
                 if (Nodo.getDerecha().getBFact() < 0) {
-                    System.out.println("Posible Doble Rotacion (Derecha, Izquierda).");
+                    System.out.println("Doble Rotacion (Derecha, Izquierda).");
                     RDI(Nodo);
                 } else {
-                    System.out.println("Posible Rotacion Simple a la Izquierda.");
+                    System.out.println("Rotacion Simple a la Izquierda.");
                     RSI(Nodo);
                 }
             } else if (Nodo.getBFact() < -1) {
                 if (Nodo.getIzquierda().getBFact() > 0) {
-                    System.out.println("Posible Doble Rotacion (Izquierda, Derecha).");
+                    System.out.println("Doble Rotacion (Izquierda, Derecha).");
                     RDD(Nodo);
                 } else {
-                    System.out.println("Posible Rotacion Simple a la Derecha.");
+                    System.out.println("Rotacion Simple a la Derecha.");
                     RSD(Nodo);
                 }
             }
@@ -260,6 +412,17 @@ public class ArbolAVL {
         Segundo.setIzquierda(SegundoDerecha);
         Primero.setDerecha(Segundo);
         Primero.setIzquierda(Tercero);
+
+        if (PrimeroDerecha != null) {
+            PrimeroDerecha.setPadre(Segundo);
+        }
+        if (SegundoDerecha != null) {
+            SegundoDerecha.setPadre(Segundo);
+        }
+        if (Tercero != null) {
+            Tercero.setPadre(Primero);
+        }
+        Segundo.setPadre(Primero);
 
         /* ReAjustar SubNiveles y Balance Factor */
         UpdateSubLevels(Segundo);
@@ -289,6 +452,17 @@ public class ArbolAVL {
         Primero.setIzquierda(Segundo);
         Primero.setDerecha(Tercero);
 
+        if (PrimeroIzquierda != null) {
+            PrimeroIzquierda.setPadre(Segundo);
+        }
+        if (SegundoIzquierda != null) {
+            SegundoIzquierda.setPadre(Segundo);
+        }
+        if (Tercero != null) {
+            Tercero.setPadre(Primero);
+        }
+        Segundo.setPadre(Primero);
+
         /* ReAjustar SubNiveles y Balance Factor */
         UpdateSubLevels(Tercero);
         UpdateSubLevels(Segundo);
@@ -312,33 +486,36 @@ public class ArbolAVL {
     }
 
     /* ---------------- Impresion Grafica del Arbol ---------------- */
-    
     public void ImpresoraGrafica() {
-        PreOrderString = "";
-        PreOrderString = PreOrderString + "digraph arbolAVL{\n";
-        PreOrderString = PreOrderString + "rankdir=TB;\n";
-        PreOrderString = PreOrderString + "layout=dot;\n";
-        NodoAVL temp = this.Raiz;
-        Normalize(temp);
-        PreOrderString = PreOrderString + "}";
-        try {
-            FileOutputStream grafica;
-            grafica = new FileOutputStream("Categorias.dot");
-            PrintStream P = new PrintStream(grafica);
-            P.println(PreOrderString);
-            P.close();
-            Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + System.getProperty("user.dir") + "\\Categorias.dot -o " + System.getProperty("user.dir") + "\\Categorias.png");
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ArbolAVL.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ArbolAVL.class.getName()).log(Level.SEVERE, null, ex);
+        if (this.Raiz == null) {
+            System.out.println("No hay nodos.");
+        } else {
+            PreOrderString = "";
+            PreOrderString = PreOrderString + "digraph arbolAVL{\n";
+            PreOrderString = PreOrderString + "rankdir=TB;\n";
+            PreOrderString = PreOrderString + "layout=dot;\n";
+            NodoAVL temp = this.Raiz;
+            Normalize(temp);
+            PreOrderString = PreOrderString + "}";
+            try {
+                FileOutputStream grafica;
+                grafica = new FileOutputStream("Categorias.dot");
+                PrintStream P = new PrintStream(grafica);
+                P.println(PreOrderString);
+                P.close();
+                Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + System.getProperty("user.dir") + "\\Categorias.dot -o " + System.getProperty("user.dir") + "\\Categorias.png");
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ArbolAVL.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ArbolAVL.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     public void PreOrder(NodoAVL Nodo) {
         PreOrderString = PreOrderString + PreOrderInt + "[label=\"" + Nodo.getData().getNombre() + "\"];\n";
-        PreOrderString = PreOrderString + PreOrderInt + " -> " + (PreOrderInt+1) + ";\n";
+        PreOrderString = PreOrderString + PreOrderInt + " -> " + (PreOrderInt + 1) + ";\n";
         PreOrderInt++;
         if (Nodo.getIzquierda() != null) {
             PreOrder(Nodo.getIzquierda());
@@ -348,7 +525,7 @@ public class ArbolAVL {
             PreOrder(Nodo.getDerecha());
         }
     }
-    
+
     public void Normalize(NodoAVL Nodo) {
         PreOrderString = PreOrderString + Nodo.getData().getNombre().replaceAll(" ", "_") + "[label=\"" + Nodo.getData().getNombre() + "\"];\n";
         if (Nodo.getIzquierda() != null) {
@@ -358,7 +535,7 @@ public class ArbolAVL {
         if (Nodo.getDerecha() != null) {
             PreOrderString = PreOrderString + Nodo.getData().getNombre().replaceAll(" ", "_") + " -> " + Nodo.getDerecha().getData().getNombre().replaceAll(" ", "_") + ";\n";
         }
-        
+
         if (Nodo.getIzquierda() != null) {
             Normalize(Nodo.getIzquierda());
         }
@@ -367,9 +544,8 @@ public class ArbolAVL {
             Normalize(Nodo.getDerecha());
         }
     }
-    
+
     /* ---------------- IMPRESION TEXTO y RECORRIDOS ---------------- */
-    
     public void Imprimir() {
         NodoAVL temp = this.Raiz;
         EnOrder(Raiz);
