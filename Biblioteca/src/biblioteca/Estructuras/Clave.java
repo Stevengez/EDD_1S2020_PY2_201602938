@@ -5,16 +5,32 @@
  */
 package biblioteca.Estructuras;
 
+import biblioteca.Libro;
+
 /**
  *
  * @author Steven
  */
 public class Clave {
+    Libro Data;
     private NodoB Menores, Mayores;
     
-    public Clave(){
+    public Clave(Libro Data){
+        this.Data = Data;
         this.Menores = null;
         this.Mayores = null;
+    }
+    
+    public int getClave(){
+        return this.Data.getISBN();
+    }
+    
+    public void setMenores(NodoB Menores){
+        this.Menores = Menores;
+    }
+    
+    public void setMayores(NodoB Mayores){
+        this.Mayores = Mayores;
     }
     
     public NodoB getMenores(){
