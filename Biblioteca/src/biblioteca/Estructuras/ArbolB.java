@@ -29,10 +29,46 @@ public class ArbolB {
         }
     }
 
+    public void RemoveBook(int ISBN) {
+        System.out.println("#######Eliminar: "+ISBN);
+        Clave temp = Eliminar(this.Raiz, ISBN);        
+        if (temp == null) {
+            System.out.println("No existe");
+        } else {
+            System.out.println("Eliminado");
+        }
+    }
+    
+    /* Reemplazar Mayor de Menores */
+    
+    private NodoB RBoM(NodoB Padre, Clave Arriba){
+        return Mayor(Padre.minClave().getMenores(), Arriba);        
+    }
+    
+    private NodoB Mayor(NodoB Padre, Clave Arriba){
+        if(Padre.maxClave().getMayores()!=null){
+            NodoB temp = Mayor(Padre.maxClave().getMayores(), Arriba);
+            Balancear(Padre);
+            return temp;
+        }else{
+            /* Reemplazar y Conectar */
+            Padre.maxClave().setMayores(Arriba.getMayores());
+            Padre.maxClave().setMenores(Arriba.getMenores());
+            Arriba.convertTo(Padre.maxClave());
+            
+            /* Eliminar */
+            //System.out.println("Voy a borrar la clave intercambiada");
+            Padre.deleteKey(Padre.maxClave());
+            //System.out.println("Aqui Comienza el balanceo del Nodo que contiene a  14");
+            Balancear(Padre);
+            return Padre;
+        }
+    }
+
     private Clave Insert(NodoB Padre, Libro Data) {
         if (Padre.SubNiveles() == 0) {
             /* Validamos si existe */
-            if (existKey(Padre, Data)) {
+            if (existKey(Padre, Data.getISBN()) != null) {
                 System.out.println("Esta clave ya existe.");
                 return null;
             }
@@ -47,7 +83,7 @@ public class ArbolB {
         } else {
             switch (Padre.getKeySize()) {
                 case 1:
-                    if (existKey(Padre, Data)) {
+                    if (existKey(Padre, Data.getISBN()) != null) {
                         System.out.println("Esta clave ya existe.");
                         return null;
                     }
@@ -64,7 +100,7 @@ public class ArbolB {
                         return temp;
                     }
                 case 2:
-                    if (existKey(Padre, Data)) {
+                    if (existKey(Padre, Data.getISBN()) != null) {
                         System.out.println("Esta clave ya existe.");
                         return null;
                     }
@@ -86,7 +122,7 @@ public class ArbolB {
                         return temp;
                     }
                 case 3:
-                    if (existKey(Padre, Data)) {
+                    if (existKey(Padre, Data.getISBN()) != null) {
                         System.out.println("Esta clave ya existe.");
                         return null;
                     }
@@ -113,7 +149,7 @@ public class ArbolB {
                         return temp;
                     }
                 case 4:
-                    if (existKey(Padre, Data)) {
+                    if (existKey(Padre, Data.getISBN()) != null) {
                         System.out.println("Esta clave ya existe.");
                         return null;
                     }
@@ -148,6 +184,140 @@ public class ArbolB {
         }
     }
 
+    private Clave Eliminar(NodoB Padre, int ISBN) {
+        if (Padre.SubNiveles() == 0) {
+            /* Validamos si existe */
+            Clave temp = existKey(Padre, ISBN);
+            if (temp != null) {
+                /* Eliminar la Hoja */
+                Padre.deleteKey(temp);
+
+                /* Balanceamos */
+                Balancear(Padre);
+                return temp;
+            }
+            return null;
+        } else {
+            switch (Padre.getKeySize()) {
+                case 1:
+                    if (existKey(Padre, ISBN) != null) {
+                        Clave temp = existKey(Padre, ISBN);
+                        RBoM(Padre, temp);
+                        
+                        /* Balanceamos */
+                        Balancear(Padre);
+                        return temp;
+                    }
+
+                    if (ISBN > Padre.getKey1().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey1().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else {
+                        Clave temp = Eliminar(Padre.getKey1().getMenores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    }
+                case 2:
+                    if (existKey(Padre, ISBN) != null) {
+                        Clave temp = existKey(Padre, ISBN);
+                        RBoM(Padre, temp).getPadre();
+                        
+                        /* Balanceamos */
+                        Balancear(Padre);
+                        return temp;
+                    }
+
+                    if (ISBN > Padre.getKey2().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey2().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey1().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else {
+                        Clave temp = Eliminar(Padre.getKey1().getMenores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    }
+                case 3:
+                    if (existKey(Padre, ISBN) != null) {
+                        Clave temp = existKey(Padre, ISBN);
+                        RBoM(Padre, temp);
+                        
+                        /* Balanceamos */
+                        Balancear(Padre);
+                        return temp;
+                    }
+
+                    if (ISBN > Padre.getKey3().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey3().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey2().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey2().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey1().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else {
+                        Clave temp = Eliminar(Padre.getKey1().getMenores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    }
+                case 4:
+                    if (existKey(Padre, ISBN) != null) {
+                        Clave temp = existKey(Padre, ISBN);
+                        RBoM(Padre, temp);
+                        
+                        /* Balanceamos */
+                        Balancear(Padre);
+                        return temp;
+                    }
+
+                    if (ISBN > Padre.getKey4().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey4().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey3().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey3().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey2().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey2().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        Clave temp = Eliminar(Padre.getKey1().getMayores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    } else {
+                        Clave temp = Eliminar(Padre.getKey1().getMenores(), ISBN);
+                        Balancear(Padre);
+                        UpdateSubLevels(Padre);
+                        return temp;
+                    }
+            }
+            return null;
+        }
+    }
+
     public void UpdateSubLevels(NodoB Padre) {
         Padre.setSubNiveles(Padre.getKey1().getMenores().SubNiveles() + 1);
     }
@@ -158,9 +328,53 @@ public class ArbolB {
             System.out.println("Requiere Balanceo (Caso de Division)");
             DivideNode(Nodo);
         } else if (Nodo.getKeySize() < 2 && Nodo != this.Raiz) {
-            System.out.println("Requiere Balanceo (Caso Menos Claves del minimo)");
+            if(Nodo.getYB()!=null && Nodo.getYB().getKeySize()>2 && Nodo.getYB().getPadre() == Nodo.getPadre()){
+                System.out.println("Requiere Balanceo (Prestamo Izquierdo)");
+                PrestamoIzquierdo(Nodo.getYB(), Nodo);
+            }else if(Nodo.getBB()!=null && Nodo.getBB().getKeySize()>2 && Nodo.getBB().getPadre() == Nodo.getPadre()){
+                System.out.println("Requiere Balanceo (Prestamo Derecho)");
+                PrestamoDerecho(Nodo,Nodo.getBB());
+            }else {
+                System.out.println("Requiere Balanceo (Union de Nodos)");
+                MergeNodo(Nodo);
+            }
+        }else{
+            System.out.println("No requiere balanceo");
         }
-
+    }
+    
+    public void PrestamoDerecho(NodoB Deficiente, NodoB Derecho){
+        Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Deficiente, Derecho);
+        Clave NuevaCentral = Derecho.minClave();
+        
+        /* Reemplazo */
+        Deficiente.getPadre().deleteKey(ClaveCentral);
+        Deficiente.getPadre().InsertNew(NuevaCentral);
+        Derecho.deleteKey(NuevaCentral);
+        
+        /* Reconectar */
+        NuevaCentral.setMayores(ClaveCentral.getMayores());
+        NuevaCentral.setMenores(ClaveCentral.getMenores());
+        
+        /* Insertar */
+        Deficiente.InsertNew(ClaveCentral);
+    }
+    
+    public void PrestamoIzquierdo(NodoB Izquierdo, NodoB Deficiente){
+        Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Izquierdo, Deficiente);
+        Clave NuevaCentral = Izquierdo.maxClave();
+        
+        /* Reemplazo */
+        Deficiente.getPadre().deleteKey(ClaveCentral);
+        Deficiente.getPadre().InsertNew(NuevaCentral);
+        Izquierdo.deleteKey(NuevaCentral);
+        
+        /* Reconectar */
+        NuevaCentral.setMayores(ClaveCentral.getMayores());
+        NuevaCentral.setMenores(ClaveCentral.getMenores());
+        
+        /* Insertar */
+        Deficiente.InsertNew(ClaveCentral);
     }
 
     public void DivideNode(NodoB Nodo) {
@@ -177,20 +391,27 @@ public class ArbolB {
         //} else {
         //  System.out.println("No tiene Padre.");
         //}
-
         if (Nodo.getPadre() != null) {
             Nodo.getKey3().setMenores(Nodo);
             NodoB Padre = Nodo.getPadre();
 
             Padre.InsertNew(Nodo.getKey3());
             mayores.setPadre(Padre);
-            
+
             if (mayores.SubNiveles() > 0) {
                 mayores.getKey1().getMenores().setPadre(mayores);
                 mayores.getKey1().getMayores().setPadre(mayores);
                 mayores.getKey2().getMayores().setPadre(mayores);
             }
-            
+
+            /* Asignar Hermanos */
+            if (Nodo.getBB() != null) {
+                Nodo.getBB().setYB(mayores);
+            }
+            mayores.setBB(Nodo.getBB());
+            Nodo.setBB(mayores);
+            mayores.setYB(Nodo);
+
             Nodo.postDivision();
         } else { //Raiz
             /*Crear y Conectar lado izquierdo */
@@ -203,11 +424,11 @@ public class ArbolB {
             /* Asignar Padre a los Nuevos Nodos */
             menores.setPadre(Nodo);
             mayores.setPadre(Nodo);
-            
+
             /* Asignar SubNiveles a Nodos Nuevos */
             menores.setSubNiveles(Nodo.SubNiveles());
             mayores.setSubNiveles(Nodo.SubNiveles());
-            
+
             /* Asignar Padre a los SubNodos */
             if (menores.SubNiveles() > 0) {
                 menores.getKey1().getMenores().setPadre(menores);
@@ -221,6 +442,11 @@ public class ArbolB {
                 mayores.getKey2().getMayores().setPadre(mayores);
             }
 
+            /* Asignar Hermanos */
+            menores.setBB(mayores);
+            mayores.setYB(menores);
+
+            /* Cambio de Nivel */
             Nodo.postDivisionRaiz();
             Nodo.addSubLevel();
             this.Raiz = Nodo;
@@ -228,9 +454,135 @@ public class ArbolB {
         System.out.println("Termine el Balanceo.");
     }
 
+    public void MergeNodo(NodoB Nodo) {
+        if(Nodo.getBB()!=null){
+            NodoB Padre = Nodo.getPadre();
+            Clave ClaveCentral = Padre.getMiddleKey(Nodo,Nodo.getBB());
+            NodoB Izquierda = Nodo;
+            NodoB Derecha = Nodo.getBB();
+            
+            if(ClaveCentral==null){
+                ClaveCentral = Padre.getMiddleKey(Nodo.getYB(),Nodo);
+                Izquierda = Nodo.getYB();
+                Derecha = Nodo;                
+            }
+            
+            System.out.println("La clave necesaria es: "+ClaveCentral.getClave());
+            ImprimirClaves(Padre);
+            
+            /* Bajar la Clave Central */
+            
+            if(Derecha.SubNiveles()>0){
+                if(Derecha.getKey2()!=null){
+                    Derecha.getKey1().getMenores().setPadre(Izquierda);
+                    Derecha.getKey1().getMayores().setPadre(Izquierda);
+                    Derecha.getKey2().getMayores().setPadre(Izquierda);
+                }else{
+                    Derecha.getKey1().getMenores().setPadre(Izquierda);
+                    Derecha.getKey1().getMayores().setPadre(Izquierda);
+                    ClaveCentral.setMayores(Derecha.getKey1().getMenores());
+                }
+                
+                if(Izquierda.getKey2()!=null){
+                    ClaveCentral.setMenores(Izquierda.getKey2().getMayores());
+                }else{
+                    ClaveCentral.setMenores(Izquierda.getKey1().getMayores());
+                }
+            }else{
+                ClaveCentral.setMenores(null); //Borrar Menores porque ahora es hoja
+                ClaveCentral.setMayores(null); //Borrar Menores porque ahora es hoja
+            }
+            //System.out.println("Aqui voy a borrar la clave central.");
+            Padre.deleteKey(ClaveCentral); //Borrar del nodo padre
+            
+            Izquierda.InsertNew(ClaveCentral);
+            
+            
+            /* Insertar las 2 o 1 claves de la derecha */
+            
+            Izquierda.InsertNew(Derecha.getKey1());
+            if(Derecha.SubNiveles()>0){
+                ClaveCentral.setMayores(Derecha.getKey1().getMenores());
+            }
+            if(Derecha.getKey2()!=null){
+                Izquierda.InsertNew(Derecha.getKey2());
+            }
+            
+            /* Reconectar Hermanos */
+            
+            if(Derecha.getBB()!=null){
+                Izquierda.setBB(Derecha.getBB());
+                Derecha.getBB().setYB(Izquierda);
+            }else{
+                Izquierda.setBB(null);
+            }
+            
+        }else{
+            NodoB Padre = Nodo.getPadre();
+            Clave ClaveCentral = Padre.getMiddleKey(Nodo.getYB(),Nodo);
+            NodoB Izquierda = Nodo.getYB();
+            NodoB Derecha = Nodo;
+            
+            System.out.println("La clave necesaria es: "+ClaveCentral.getClave());
+            ImprimirClaves(Padre);
+            
+            /* Bajar la Clave Central */
+            if(Derecha.SubNiveles()>0){
+                if(Derecha.getKey2()!=null){
+                    Derecha.getKey1().getMenores().setPadre(Izquierda);
+                    Derecha.getKey1().getMayores().setPadre(Izquierda);
+                    Derecha.getKey2().getMayores().setPadre(Izquierda);
+                }else{
+                    Derecha.getKey1().getMenores().setPadre(Izquierda);
+                    Derecha.getKey1().getMayores().setPadre(Izquierda);
+                    ClaveCentral.setMayores(Derecha.getKey1().getMenores());
+                }
+                
+                if(Izquierda.getKey2()!=null){
+                    ClaveCentral.setMenores(Izquierda.getKey2().getMayores());
+                }else{
+                    ClaveCentral.setMenores(Izquierda.getKey1().getMayores());
+                }
+            }else{
+                ClaveCentral.setMenores(null); //Borrar Menores porque ahora es hoja
+                ClaveCentral.setMayores(null); //Borrar Menores porque ahora es hoja
+            }
+            //System.out.println("Aqui voy a borrar la clave central.");
+            Padre.deleteKey(ClaveCentral); //Borrar del nodo padre
+            ImprimirClaves(Padre);
+            
+            Izquierda.InsertNew(ClaveCentral);
+            
+            
+            /* Insertar las 2 o 1 claves de la derecha */
+            
+            Izquierda.InsertNew(Derecha.getKey1());
+            if(Derecha.SubNiveles()>0){
+                ClaveCentral.setMayores(Derecha.getKey1().getMenores());
+            }
+            if(Derecha.getKey2()!=null){
+                Izquierda.InsertNew(Derecha.getKey2());
+            }
+            
+            /* Reconectar Hermanos */
+            
+            if(Derecha.getBB()!=null){
+                Izquierda.setBB(Derecha.getBB());
+                Derecha.getBB().setYB(Izquierda);
+            }else{
+                Izquierda.setBB(null);
+            }
+        }
+        System.out.println("Termine el Balanceo.");
+    }
+
     public void Imprimir() {
         System.out.println("******Imprimiendo Arbol**********");
         EnOrder(this.Raiz);
+    }
+
+    public void ImprimirNiveles() {
+        Niveles(this.Raiz, 0);
     }
 
     public void EnOrder(NodoB Padre) {
@@ -341,6 +693,25 @@ public class ArbolB {
 
     }
 
+    public void Niveles(NodoB Izquierda, int Nivel) {
+        /*Hermanos Izquierdos*/
+        NodoB temp = Izquierda;
+        System.out.println("------- Nivel : " + Nivel + " ---------");
+        String nivel = "";
+        while (temp != null) {
+            nivel = nivel + StringClaves(temp) + " > ";
+            temp = temp.getBB();
+        }
+        System.out.println(nivel);
+        System.out.println("----------------- -----------");
+        if (Izquierda.getKey1().getMenores() != null) {
+            Niveles(Izquierda.getKey1().getMenores(), Nivel + 1);
+        } else {
+            System.out.println("Estoy en el nivel " + Nivel + " y ya no hay mas niveles.");
+        }
+
+    }
+
     private void ImprimirClaves(NodoB Nodo) {
         switch (Nodo.getKeySize()) {
             case 1:
@@ -364,50 +735,65 @@ public class ArbolB {
         }
     }
 
-    private boolean existKey(NodoB Padre, Libro Data) {
+    private String StringClaves(NodoB Nodo) {
+        switch (Nodo.getKeySize()) {
+            case 1:
+                return Nodo.getKey1().getClave() + "";
+            case 2:
+                return Nodo.getKey1().getClave() + "," + Nodo.getKey2().getClave();
+            case 3:
+                return Nodo.getKey1().getClave() + "," + Nodo.getKey2().getClave() + "," + Nodo.getKey3().getClave();
+            case 4:
+                return Nodo.getKey1().getClave() + "," + Nodo.getKey2().getClave() + "," + Nodo.getKey3().getClave() + "," + Nodo.getKey4().getClave();
+            default:
+                return "";
+        }
+    }
+
+    private Clave existKey(NodoB Padre, int ISBN) {
         switch (Padre.getKeySize()) {
             case 1:
-                if (Data.getISBN() == Padre.getKey1().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey1().getClave()) {
+                    return Padre.getKey1();
                 }
                 break;
             case 2:
-                if (Data.getISBN() == Padre.getKey1().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey1().getClave()) {
+                    return Padre.getKey1();
                 }
-                if (Data.getISBN() == Padre.getKey2().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey2().getClave()) {
+                    return Padre.getKey2();
                 }
                 break;
             case 3:
-                if (Data.getISBN() == Padre.getKey1().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey1().getClave()) {
+                    return Padre.getKey1();
                 }
-                if (Data.getISBN() == Padre.getKey2().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey2().getClave()) {
+                    return Padre.getKey2();
                 }
-                if (Data.getISBN() == Padre.getKey3().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey3().getClave()) {
+                    return Padre.getKey3();
                 }
                 break;
             case 4:
-                if (Data.getISBN() == Padre.getKey1().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey1().getClave()) {
+                    return Padre.getKey1();
                 }
-                if (Data.getISBN() == Padre.getKey2().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey2().getClave()) {
+                    return Padre.getKey2();
                 }
-                if (Data.getISBN() == Padre.getKey3().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey3().getClave()) {
+                    return Padre.getKey3();
                 }
-                if (Data.getISBN() == Padre.getKey4().getClave()) {
-                    return true;
+                if (ISBN == Padre.getKey4().getClave()) {
+                    return Padre.getKey4();
                 }
                 break;
             default:
-                return false;
+                return null;
         }
-        return false;
+        return null;
     }
 
 }

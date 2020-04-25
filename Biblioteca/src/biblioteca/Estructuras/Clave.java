@@ -21,6 +21,16 @@ public class Clave {
         this.Mayores = null;
     }
     
+    public void convertTo(Clave clave){
+        this.Data = clave.getData();
+        this.Menores = clave.getMenores();
+        this.Mayores = clave.getMayores();
+    }
+    
+    public Libro getData(){
+        return this.Data;
+    }
+    
     public int getClave(){
         return this.Data.getISBN();
     }

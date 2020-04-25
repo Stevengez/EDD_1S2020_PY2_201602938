@@ -12,7 +12,7 @@ import biblioteca.Libro;
  * @author Steven
  */
 public class NodoB {
-    private NodoB Padre;
+    private NodoB Padre, HermanoMayor, HermanoMenor;
     private Clave Clave1, Clave2, Clave3, Clave4, Aux;
     private int NumeroHijos,NumeroClaves, SubNiveles;
 
@@ -26,7 +26,25 @@ public class NodoB {
         this.Clave3 = null;
         this.Clave4 = null;
         this.Aux = null;
+        this.HermanoMayor = null;
+        this.HermanoMenor = null;
 
+    }
+    
+    public void setBB(NodoB Hermano){
+        this.HermanoMayor = Hermano;
+    }
+    
+    public void setYB(NodoB Hermano){
+        this.HermanoMenor = Hermano;
+    }
+    
+    public NodoB getBB(){
+        return this.HermanoMayor;
+    }
+    
+    public NodoB getYB(){
+        return this.HermanoMenor;
     }
     
     public NodoB getPadre(){
@@ -36,88 +54,6 @@ public class NodoB {
     public void setPadre(NodoB Padre){
         this.Padre = Padre;
     }
-    
-    /*
-    public void InsertNew(Libro Data) {
-        if (Clave1 == null) {
-            Clave1 = new Clave(Data);
-            this.NumeroClaves = 1;
-        } else {
-            switch (getKeySize()) {
-                case 1:
-                    if(Data.getISBN()>Clave1.getClave()){
-                        Clave2 = new Clave(Data);
-                    }else if(Data.getISBN()<Clave1.getClave()){
-                        Clave2 = Clave1;
-                        Clave1 = new Clave(Data);
-                    }else{
-                        System.out.println("Esa clave ya existe.");
-                    }
-                    this.NumeroClaves = 2;
-                    break;
-                case 2:
-                    if(Data.getISBN()>Clave2.getClave()){
-                        Clave3 = new Clave(Data);
-                    }else if(Data.getISBN()>Clave1.getClave()){
-                        Clave3 = Clave2;
-                        Clave2 = new Clave(Data);
-                    }else{
-                        Clave3 = Clave2;
-                        Clave2 = Clave1;
-                        Clave1 = new Clave(Data);
-                    }
-                    this.NumeroClaves = 3;
-                    break;
-                case 3:
-                    if(Data.getISBN()>Clave3.getClave()){
-                        Clave4 = new Clave(Data);
-                    }else if(Data.getISBN()>Clave2.getClave()){
-                        Clave4 = Clave3;
-                        Clave3 = new Clave(Data);
-                    }else if(Data.getISBN()>Clave1.getClave()){
-                        Clave4 = Clave3;
-                        Clave3 = Clave2;
-                        Clave2 = new Clave(Data);
-                    }else{
-                        Clave4 = Clave3;
-                        Clave3 = Clave2;
-                        Clave2 = Clave1;
-                        Clave1 = new Clave(Data);                        
-                    }
-                    this.NumeroClaves = 4;
-                    break;
-                case 4:
-                    if(Data.getISBN()>Clave4.getClave()){
-                        Aux = new Clave(Data);
-                    }else if(Data.getISBN()>Clave3.getClave()){
-                        Aux = Clave4;
-                        Clave4 = new Clave(Data);
-                    }else if(Data.getISBN()>Clave2.getClave()){
-                        Aux = Clave4;
-                        Clave4 = Clave3;
-                        Clave3 = new Clave(Data);
-                    }else if(Data.getISBN()>Clave1.getClave()){
-                        Aux = Clave4;
-                        Clave4 = Clave3;
-                        Clave3 = Clave2;
-                        Clave2 = new Clave(Data);
-                    }else{
-                        Aux = Clave4;
-                        Clave4 = Clave3;
-                        Clave3 = Clave2;
-                        Clave2 = Clave1;
-                        Clave1 = new Clave(Data);
-                    }
-                    this.NumeroClaves = 5;
-                    break;
-                default:
-                    System.out.println("La cantidad de claves no coinciden.");
-                    break;
-            }
-
-        }
-    }
-    */
     
     public void InsertNew(Clave Nuevo) {
         if (Clave1 == null) {
@@ -229,6 +165,28 @@ public class NodoB {
         }
     }
     
+    public void deleteKey(Clave clave){
+        if(Clave1==clave){
+            System.out.println("Borre la clave 1");
+            Clave1 = Clave2;
+            Clave2 = Clave3;
+            Clave3 = Clave4;
+            Clave4 = null;
+        }else if(Clave2 == clave){
+            System.out.println("Borre la clave 2");
+            Clave2 = Clave3;
+            Clave3 = Clave4;
+            Clave4 = null;
+        }else if(Clave3 == clave){
+            System.out.println("Borre la clave 3");
+            Clave3 = Clave4;
+            Clave4 = null;
+        }else{
+            System.out.println("Borre la clave 4");
+            Clave4 = null;
+        }
+    }
+        
     public void setSubNiveles(int SubNiveles){
         this.SubNiveles = SubNiveles;
     }
@@ -243,6 +201,20 @@ public class NodoB {
     
     public void removeSubLevel(){
         this.SubNiveles--;
+    }
+    
+    public Clave getMiddleKey(NodoB A, NodoB B){
+        if(Clave1!=null && (Clave1.getMenores()==A && Clave1.getMayores()==B)){
+            Clave2.setMenores(Clave1.getMenores());
+            return Clave1;
+        }else if(Clave2!=null && (Clave2.getMenores()==A && Clave2.getMayores()==B)){
+            return Clave2;
+        }else if(Clave3!=null && (Clave3.getMenores()==A && Clave3.getMayores()==B)){
+            return Clave3;
+        }else if(Clave4 !=null && (Clave4.getMenores()==A && Clave4.getMayores()==B)){
+            return Clave4;
+        }
+        return null;
     }
     
     public void postDivision(){
@@ -279,6 +251,20 @@ public class NodoB {
             keysize++;
         }
         return keysize;
+    }
+    
+    public Clave minClave(){
+        if(Clave1!=null) return Clave1;
+        return null;
+    }
+    
+    public Clave maxClave(){
+        if(Aux!=null) return Aux;
+        if(Clave4!=null) return Clave4;
+        if(Clave3!=null) return Clave3;
+        if(Clave2!=null) return Clave2;
+        if(Clave1!=null) return Clave1;
+        return null;
     }
     
     public int minKey(){

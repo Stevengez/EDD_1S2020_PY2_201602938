@@ -103,6 +103,7 @@ public class Biblioteca {
         librero.NewBook(new Libro(29, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
         
         librero.NewBook(new Libro(30, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
+        /*
         librero.NewBook(new Libro(31, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
         librero.NewBook(new Libro(32, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
         librero.NewBook(new Libro(33, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
@@ -180,9 +181,29 @@ public class Biblioteca {
         librero.NewBook(new Libro(99, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
         
         librero.NewBook(new Libro(100, "The Lord of the Rings","J.K.K. Tolkien","Paramount Books",1980,1,"Edad Media","Ingles", 201602938));
-      
+        */
         
-        librero.Imprimir();
+        //librero.Imprimir();
+        System.out.println("*************PRE Casos de Eliminacion**************");
+        librero.ImprimirNiveles();
+        System.out.println("*************Casos de Eliminacion**************");
+        //librero.RemoveBook(100);
+        //librero.RemoveBook(95);
+        librero.RemoveBook(8);
+        librero.RemoveBook(17);
+        librero.RemoveBook(16);
+        librero.RemoveBook(9);
+        librero.RemoveBook(25);
+        librero.RemoveBook(20);
+        
+        
+        librero.ImprimirNiveles();
+        
+        //librero.ImprimirNiveles();
+        //librero.RemoveBook(14);
+        //librero.ImprimirNiveles();
+        //librero.RemoveBook(17);
+        //librero.ImprimirNiveles();
 
     }
 
