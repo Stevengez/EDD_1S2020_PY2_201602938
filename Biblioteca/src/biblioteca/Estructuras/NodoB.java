@@ -205,11 +205,26 @@ public class NodoB {
     
     public Clave getMiddleKey(NodoB A, NodoB B){
         if(Clave1!=null && (Clave1.getMenores()==A && Clave1.getMayores()==B)){
-            Clave2.setMenores(Clave1.getMenores());
             return Clave1;
         }else if(Clave2!=null && (Clave2.getMenores()==A && Clave2.getMayores()==B)){
             return Clave2;
         }else if(Clave3!=null && (Clave3.getMenores()==A && Clave3.getMayores()==B)){
+            return Clave3;
+        }else if(Clave4 !=null && (Clave4.getMenores()==A && Clave4.getMayores()==B)){
+            return Clave4;
+        }
+        return null;
+    }
+    
+    public Clave getMiddleKeyAndChangeRight(NodoB A, NodoB B){
+        if(Clave1!=null && (Clave1.getMenores()==A && Clave1.getMayores()==B)){
+            if(Clave2!=null) Clave2.setMenores(Clave1.getMenores());
+            return Clave1;
+        }else if(Clave2!=null && (Clave2.getMenores()==A && Clave2.getMayores()==B)){
+            if(Clave3!=null) Clave3.setMenores(Clave2.getMenores());
+            return Clave2;
+        }else if(Clave3!=null && (Clave3.getMenores()==A && Clave3.getMayores()==B)){
+            if(Clave4!=null) Clave4.setMenores(Clave3.getMenores());
             return Clave3;
         }else if(Clave4 !=null && (Clave4.getMenores()==A && Clave4.getMayores()==B)){
             return Clave4;
