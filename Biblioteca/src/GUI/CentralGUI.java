@@ -6,9 +6,16 @@
 package GUI;
 
 import JSONCreator.Constantes;
+import JSONCreator.JSONCreator;
 import biblioteca.Biblioteca;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.PropertyVetoException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -29,26 +36,40 @@ public class CentralGUI extends JFrame implements ActionListener {
 
 
     /* Data Source */
-    private Biblioteca Context;
+    private Biblioteca VirtualLibrary;
 
-    public CentralGUI(Biblioteca Context) {
-        this.Context = Context;
+    public CentralGUI(Biblioteca VirtualLibrary) {
+        this.VirtualLibrary = VirtualLibrary;
         this.LoggedIn = false;
         this.BootUp = false;
 
         setTitle("Biblioteca Virtual");
         setSize(1300, 700);
         setJMenuBar(crearMenu());
+        super.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e){
+                VirtualLibrary.getBlockChain().generateBlockListFile();
+                System.out.println("Cerrado desde la GUI");
+                System.exit(0);
+            }
+        });
+        
+        
 
         MultiWindowDesk = new JDesktopPane();
         MultiWindowDeskManager = new DesktopManager_Modificado();
         MultiWindowDesk.setDesktopManager(MultiWindowDeskManager);
         getContentPane().add(MultiWindowDesk);
 
-        MultiWindowDesk.add(new Settings(this, Context.getNetworkManager()));
+        MultiWindowDesk.add(new Settings(this, VirtualLibrary.getNetworkManager()));
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+
+    public Biblioteca getVirtualLibrary() {
+        return this.VirtualLibrary;
     }
 
     private JMenuBar crearMenu() {
@@ -57,6 +78,10 @@ public class CentralGUI extends JFrame implements ActionListener {
         JMenu menu_opcion_Bilioteca = new JMenu("Biblioteca");
         JMenu menu_opcion_CargaMasica = new JMenu("Carga Masiva");
         JMenu menu_opcion_Reportes = new JMenu("Reportes");
+        JMenu menu_opcion_Bloques = new JMenu("Bloques");
+
+        JMenuItem menu_opcion_Bilioteca_Sincronizar = new JMenuItem("Sincronizar Cambios");
+        menu_opcion_Bilioteca_Sincronizar.setEnabled(false);
 
         JMenuItem menu_opcion_Bilioteca_LogInOut = new JMenuItem("Iniciar Sesion");
         JMenuItem menu_opcion_Bilioteca_MyVirtual = new JMenuItem("Mi Biblioteca");
@@ -101,9 +126,12 @@ public class CentralGUI extends JFrame implements ActionListener {
         menu_opcion_Reportes.add(menu_opcion_Reportes_BlockCHain);
         menu_opcion_Reportes.add(menu_opcion_Reportes_NetworkList);
 
+        menu_opcion_Bloques.add(menu_opcion_Bilioteca_Sincronizar);
+
         menu_superior.add(menu_opcion_Bilioteca);
         menu_superior.add(menu_opcion_CargaMasica);
         menu_superior.add(menu_opcion_Reportes);
+        menu_superior.add(menu_opcion_Bloques);
 
         /* Action Command */
         menu_opcion_Bilioteca_LogInOut.setActionCommand(Constantes.MENU_OPCION_Bilioteca_LogInOut);
@@ -118,6 +146,7 @@ public class CentralGUI extends JFrame implements ActionListener {
         menu_opcion_Reportes_TablaHash.setActionCommand(Constantes.MENU_OPCION_Reportes_TablaHash);
         menu_opcion_Reportes_BlockCHain.setActionCommand(Constantes.MENU_OPCION_Reportes_BlockCHain);
         menu_opcion_Reportes_NetworkList.setActionCommand(Constantes.MENU_OPCION_Reportes_NetworkList);
+        menu_opcion_Bilioteca_Sincronizar.setActionCommand(Constantes.MENU_OPCION_BLOCKCHAIN_SYNC);
 
         /* Listener */
         menu_opcion_Bilioteca_LogInOut.addActionListener(this);
@@ -132,8 +161,8 @@ public class CentralGUI extends JFrame implements ActionListener {
         menu_opcion_Reportes_TablaHash.addActionListener(this);
         menu_opcion_Reportes_BlockCHain.addActionListener(this);
         menu_opcion_Reportes_NetworkList.addActionListener(this);
+        menu_opcion_Bilioteca_Sincronizar.addActionListener(this);
 
-        menu_superior.setEnabled(false);
         return menu_superior;
     }
 
@@ -149,6 +178,8 @@ public class CentralGUI extends JFrame implements ActionListener {
         getJMenuBar().getMenu(2).getItem(2).setEnabled(true);
         getJMenuBar().getMenu(2).getItem(3).setEnabled(true);
         getJMenuBar().getMenu(2).getItem(4).setEnabled(true);
+
+        getJMenuBar().getMenu(3).getItem(0).setEnabled(true);
     }
 
     public void enabledLoggedIn() {
@@ -174,7 +205,7 @@ public class CentralGUI extends JFrame implements ActionListener {
     public void updateLogStatus() {
         if (this.LoggedIn) {
             enabledLoggedIn();
-        } else if (Context.getNetworkManager().getUniqueNodeFlag() || Context.getNetworkManager().getSyncFlag()) {
+        } else if (VirtualLibrary.getNetworkManager().getUniqueNodeFlag() || VirtualLibrary.getNetworkManager().getSyncFlag()) {
             getJMenuBar().getMenu(0).getItem(0).setText("Iniciar Sesion");
             enableLoggedOut();
         } else {
@@ -190,20 +221,72 @@ public class CentralGUI extends JFrame implements ActionListener {
         return this.BootUp;
     }
 
+    private JInternalFrame existWindow(JDesktopPane Ventanas, String windowName) {
+        JInternalFrame[] ventanas = Ventanas.getAllFrames();
+        for (JInternalFrame ventana : ventanas) {
+            if (ventana.getName().equals(windowName)) {
+                return ventana;
+            }
+        }
+        return null;
+    }
+
+    public void showWindow(JDesktopPane Ventanas, String windowName) {
+        JInternalFrame[] ventanas = Ventanas.getAllFrames();
+        for (JInternalFrame ventana : ventanas) {
+            if (ventana.getName().equals(windowName)) {
+                try {
+                    ventana.setIcon(false);
+                    ventana.toFront();
+                    ventana.show();                    
+                } catch (PropertyVetoException ex) {
+                    Logger.getLogger(CentralGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    public void hideWindow(JDesktopPane Ventanas, String windowName) {
+        JInternalFrame[] ventanas = Ventanas.getAllFrames();
+        for (JInternalFrame ventana : ventanas) {
+            if (ventana.getName().equals(windowName)) {
+                ventana.hide();
+            }
+        }
+    }
+
+    public void hideAllWindow(JDesktopPane Ventanas) {
+        JInternalFrame[] ventanas = Ventanas.getAllFrames();
+        for (JInternalFrame ventana : ventanas) {
+            try {
+                ventana.setIcon(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(CentralGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case Constantes.MENU_OPCION_Bilioteca_Opciones:
-                JInternalFrame[] Ventanas = MultiWindowDesk.getAllFrames();
-                for (JInternalFrame ventana : Ventanas) {
-                    if (ventana.getName().equals(Constantes.GUI_VENTANA_OPCIONES)) {
-                        ventana.show();
-                    }
-                }
+                showWindow(MultiWindowDesk, Constantes.GUI_VENTANA_OPCIONES);
                 break;
             case Constantes.MENU_OPCION_CargaMasica_Usuarios:
-                System.out.println("Menu:: Carga Masiva de usuarios");
-
+                JInternalFrame carga_usuario = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_CARGA_USUARIOS);
+                if (carga_usuario != null) {
+                    carga_usuario.show();
+                } else {
+                    MultiWindowDesk.add(new Usuarios(this));
+                }
+                break;
+            case Constantes.MENU_OPCION_BLOCKCHAIN_SYNC:
+                JInternalFrame sync_block = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_SYNCBLOCK);
+                if (sync_block != null) {
+                    sync_block.show();
+                } else {
+                    MultiWindowDesk.add(new BlockUpload(this));
+                }
                 break;
         }
     }

@@ -1,0 +1,29 @@
+{
+"DATA":[
+	{
+		"CREAR_USUARIO":[
+			{
+				"Carnet": 201602990,
+				"Nombre": "Ivan",
+				"Apellido": "Pineda",
+				"Carrera":"Ingenieria en Sistemas",
+				"Password": "Keyuser98"
+			},
+			{
+				"Carnet": 201515233,
+				"Nombre": "Jessica",
+				"Apellido": "Zapata",
+				"Carrera":"Ingenieria Industrial",
+				"Password": "Manulove0"
+			},
+			{
+				"Carnet": 201805428,
+				"Nombre": "Ronaldo",
+				"Apellido": "Rojas",
+				"Carrera":"Ingenieria en Sistemas",
+				"Password": "PazSandoval5"
+			}
+		]
+	}
+]
+}

@@ -30,27 +30,58 @@ public class Constantes {
     
     public final static int RED_DEFAULT_TIMEOUT = 1000;
     
+    /* BlockChain */
+    public final static String JSON_BLOCKLIST_LABEL = "BLOQUES_LISTADO";
+    public final static String JSON_BLOCKLIST_ARRAY_FILENAME = "FILE_NAME";
+    public final static String JSON_BLOCKLIST_FILE_PREFIX = "Block_";
+    
+    public final static String JSON_BLOCKLIST_FILE = "BlockList";
+    public final static String JSON_BLOCKLIST_FILE_EXT = ".json";
+    public final static String JSON_BLOCKLIST_FOLDER = "Bloques";
+    
+    /* NETWORK REQUEST */
+    
     public final static String REQUEST_NETWORKNODES = "R:NETWORKNODES";
     public final static String REQUEST_CLOSESOCKET = "R:CLOSESOCKET";
+    public final static String REQUEST_ADDNODE = "R:ADDNODE";
+    public final static String REQUEST_ADDNODE_CONFIRMATION = "C:NODEADDED";
+    public final static String REQUEST_ADDNODE_ERROR = "CE:ERRORCORRUPTED";
     
     /* JSON LABEL */
     
     public final static String JSON_DATA_LABEL = "DATA";
+    public final static String JSON_INDEX = "INDEX";
+    public final static String JSON_TIMESTAMP = "TIMESTAMP";
+    public final static String JSON_NONCE = "NONCE";
+    public final static String JSON_PREVIOUSHASH = "PREVIOUSHASH";
+    public final static String JSON_HASH = "HASH";
     
-    public final static String JSON_RED_NODOS_ARRAY = "NODOS";
-    public final static String JSON_RED_ADD = "RED_ADD";
-    public final static String JSON_RED_DELETE = "RED_DELETE";
-    public final static String JSON_RED_NODO_IP = "NODO_IP";
-    public final static String JSON_RED_NODO_SERVERPORT = "NODO_PORT";
     
     public final static String JSON_USUARIOS_ADD = "CREAR_USUARIO";
     public final static String JSON_USUARIOS_EDIT = "EDITAR_USUARIO";
+    public final static String JSON_USUARIOS_DELETE = "ELIMINAR_USUARIO";
     
     public final static String JSON_BOOKS_ADD = "CREAR_LIBRO";
     public final static String JSON_BOOKS_DELETE = "ELIMINAR_LIBRO";
     
     public final static String JSON_CATEGORY_ADD = "CREAR_CATEGORIA";
     public final static String JSON_CATEGORY_DELETE = "ELIMINAR_CATEGORIA";
+    
+    /* JSON LABEL RED */
+    
+    public final static String JSON_RED_NODOS_ARRAY = "NODOS";
+    public final static String JSON_RED_ADD = "RED_ADD";
+    public final static String JSON_RED_DELETE = "RED_DELETE";
+    public final static String JSON_RED_NODO_IP = "NODO_IP";
+    public final static String JSON_RED_NODO_SERVERPORT = "NODO_PORT";
+        
+    /* JSON LABEL USUARIOS */
+    
+    public final static String JSON_USER_CARNET = "Carnet";
+    public final static String JSON_USER_NOMBRE = "Nombre";
+    public final static String JSON_USER_APELLIDO = "Apellido";
+    public final static String JSON_USER_CARRERA = "Carrera";
+    public final static String JSON_USER_PASSWORD = "Password";
     
     /* Constantes estructuras */
     
@@ -59,6 +90,10 @@ public class Constantes {
     /* GUI Constantes */
     
     public final static String GUI_VENTANA_OPCIONES = "CONFIGURACION";
+    public final static String GUI_VENTANA_CARGA_USUARIOS = "CARGAUSUARIOS";
+    public final static String GUI_VENTANA_CARGA_LIBROS = "CARGALIBROS";
+    public final static String GUI_VENTANA_MI_CUENTA = "MIPERFIL";
+    public final static String GUI_VENTANA_SYNCBLOCK = "SINCRONIZADOR";
     
     /* Constantes del Menu */
     
@@ -74,7 +109,9 @@ public class Constantes {
     public final static String MENU_OPCION_Reportes_TablaHash = "RT";
     public final static String MENU_OPCION_Reportes_BlockCHain = "RB";
     public final static String MENU_OPCION_Reportes_NetworkList = "RR";
-        
+    public final static String MENU_OPCION_BLOCKCHAIN_SYNC = "BCS";
+    
+    
     private Constantes(){
         
     }

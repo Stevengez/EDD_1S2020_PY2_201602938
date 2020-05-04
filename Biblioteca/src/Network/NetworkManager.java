@@ -56,7 +56,7 @@ public class NetworkManager {
     public void createServer(){
         if(!this.ServerON){
             this.ServerON = true;
-            this.Server = new Server(this);
+            this.Server = new Server(LibraryManager);
             this.Server.start();
         }else{
             System.out.println("Ya esta corriendo el servidor");

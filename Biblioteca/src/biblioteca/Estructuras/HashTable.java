@@ -6,6 +6,8 @@
 package biblioteca.Estructuras;
 
 import JSONCreator.Constantes;
+import JSONCreator.JSONCreator;
+import biblioteca.Biblioteca;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -18,14 +20,33 @@ import java.util.logging.Logger;
 public class HashTable {
     private NodoHash[] Casilleros;
     private int size;
+    //private Biblioteca VirtualLibrary;
     
     public HashTable(){
+        //this.VirtualLibrary = VirtualLibrary;
         Casilleros = new NodoHash[Constantes.HASH_TABLE_MAXSIZE];    
     }
     
-    public void newUser(int Carnet, String Nombre, String Apellido, String Carrera, String Password){
+    public SubNodoHash newUser(int Carnet, String Nombre, String Apellido, String Carrera, String Password, boolean LocalJSON){
         if (Casilleros[getLockerID(Carnet)] == null) Casilleros[getLockerID(Carnet)] = new NodoHash(this);
-        Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, getMD5From(Password));
+        SubNodoHash nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, getMD5From(Password));
+        if(!LocalJSON){
+            if(nuevo != null){
+                /* Agregar Operacion al Bloque */
+                JSONCreator.addUserOperation(JSONCreator.getCurrentBlock(), nuevo);
+            }
+        }
+        return nuevo;
+    }
+    
+    public void delUser(int Carnet, boolean LocalJSON){
+        SubNodoHash eliminar = Casilleros[getLockerID(Carnet)].removeCarnet(Carnet);
+        if(eliminar != null){
+            if(!LocalJSON){
+                /* Agregar Operacion al Bloque */
+                JSONCreator.delUserOperation(JSONCreator.getCurrentBlock(), eliminar);
+            }
+        }
     }
     
     public String getMD5From(String Password){

@@ -18,10 +18,12 @@ import java.util.logging.Logger;
  * @author Steven
  */
 public class Server extends Thread{
+    private Biblioteca LibraryManager;
     private NetworkManager NetManager;
-    public Server(NetworkManager Context){
+    public Server(Biblioteca LibraryManager){
         System.out.println("-------Hilo Servidor Comenzado------");
-        this.NetManager = Context;
+        this.LibraryManager = LibraryManager;
+        this.NetManager = LibraryManager.getNetworkManager();
     }
     
     public void run(){
@@ -31,7 +33,7 @@ public class Server extends Thread{
             System.out.println("Servidor:: UP and Running on "+Servidor.getInetAddress().getHostAddress());
             while(NetManager.getServerStatus()){
                 System.out.println("Servidor:: Esperando una Conexion...");
-                new ServerThread(NetManager, Servidor.accept()).start();        
+                new ServerThread(LibraryManager, Servidor.accept()).start();        
                 System.out.println("Servidor:: Cliente encontrado");
             }
             Servidor.close();

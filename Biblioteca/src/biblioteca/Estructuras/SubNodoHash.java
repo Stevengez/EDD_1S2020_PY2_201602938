@@ -20,7 +20,11 @@ public class SubNodoHash {
     private SubNodoHash siguiente,anterior;
     
     public SubNodoHash(int Carnet, String Nombre, String Apellido, String Carrera, String Password){
-        
+        this.Carnet = Carnet;
+        this.Nombre = Nombre;
+        this.Apellido = Apellido;
+        this.Carrera  = Carrera;
+        this.Password = Password;
         
     }
     

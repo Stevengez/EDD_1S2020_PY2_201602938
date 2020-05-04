@@ -11,11 +11,13 @@ import Network.IPRegistration;
 import GUI.CentralGUI;
 import GUI.DesktopManager_Modificado;
 import GUI.SyncWindow;
+import JSONCreator.JSONCreator;
 import Network.NetworkManager;
 import biblioteca.Estructuras.ArbolAVL;
 import biblioteca.Estructuras.ArbolB;
 import biblioteca.Estructuras.ListaSimple;
-import JSONCreator.NodeCreator;
+import JSONCreator.JSONCreator;
+import biblioteca.Estructuras.BlockChain;
 import biblioteca.Estructuras.HashTable;
 import biblioteca.Estructuras.NodoAVL;
 import java.io.IOException;
@@ -35,27 +37,43 @@ public class Biblioteca extends JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        JSONCreator.createBlock();
         new CentralGUI(new Biblioteca());
     }
     
     /* Estructuras Variables */
-    private ArbolB Librero;
-    
+    private ArbolAVL Librero;
+    private HashTable Usuarios;
     
     /* Controaldores */
-    NetworkManager router;
+    private NetworkManager router;
     
+    /* Creador de Nodos */
+    private BlockChain Satoshi;
+    
+        
     public Biblioteca() {
         /* Manejador de la Red */
         router = new NetworkManager(this);
         
         /* Inicializar Estructuras Principales */
+        Librero = new ArbolAVL();
+        Usuarios = new HashTable();
         
-        Librero = new ArbolB();
-        
-        /* Pruebas de Tabla Hash */
-        HashTable Usuarios = new HashTable();
-        
+        /* Creador de Nodos */
+        Satoshi = new BlockChain(this);
+    }
+    
+    public ArbolAVL getLibrero(){
+        return this.Librero;
+    }
+    
+    public HashTable getUsuarios(){
+        return this.Usuarios;
+    }
+    
+    public BlockChain getBlockChain(){
+        return this.Satoshi;
     }
     
     public NetworkManager getNetworkManager(){

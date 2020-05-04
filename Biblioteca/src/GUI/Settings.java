@@ -6,10 +6,11 @@
 package GUI;
 
 import JSONCreator.Constantes;
-import JSONCreator.JSONTraductor;
+import JSONCreator.JSONCreator;
 import Network.Client;
 import Network.NetworkManager;
 import biblioteca.Estructuras.ArbolAVL;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -320,7 +321,7 @@ public class Settings extends javax.swing.JInternalFrame {
                         NetManager.getClient().requestCloseSocket();
                         NetManager.setSyncFlag();
                         Centralgui.updateLogStatus();
-                        JSONTraductor.parseDataBlock(Respuesta, NetManager, new ArbolAVL(), new Object());
+                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, false, this);
                     }else{
                         System.out.println("No se pudo conectar");
                     }

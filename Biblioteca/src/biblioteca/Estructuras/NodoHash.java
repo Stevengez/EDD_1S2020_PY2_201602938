@@ -5,6 +5,8 @@
  */
 package biblioteca.Estructuras;
 
+import JSONCreator.JSONCreator;
+
 /**
  *
  * @author Steven
@@ -21,13 +23,14 @@ public class NodoHash {
         this.Final = null;
     }
 
-    public void addCarnet(int Carnet, String Nombre, String Apellido, String Carrera, String Password) {
+    public SubNodoHash addCarnet(int Carnet, String Nombre, String Apellido, String Carrera, String Password) {
         SubNodoHash nuevo = new SubNodoHash(Carnet, Nombre, Apellido, Carrera, Password);
         if (Inicio == null) {
             Inicio = nuevo;
             Final = nuevo;
             this.size++;
             this.Padre.addToSize();
+            return nuevo;
         } else {
             if (existID(Carnet)==null) {
                 Final.setSiguiente(nuevo);
@@ -35,8 +38,10 @@ public class NodoHash {
                 Final = nuevo;
                 this.size++;
                 this.Padre.addToSize();
+                return nuevo;
             } else {
                 System.out.println("Ya existe este usuario.");
+                return null;
             }
         }
     }
@@ -56,7 +61,7 @@ public class NodoHash {
         return null;
     }
     
-    public void removeCarnet(int Carnet){
+    public SubNodoHash removeCarnet(int Carnet){
         SubNodoHash aux = existID(Carnet);
         if(aux !=null){
             if(aux == Inicio){
@@ -68,6 +73,7 @@ public class NodoHash {
                 }
                 this.size--;
                 this.Padre.resToSize();
+                return aux;
             }else if(aux == Final){
                 if(Final.getAnterior()!=null){
                     Final.getAnterior().setSiguiente(null);
@@ -78,14 +84,17 @@ public class NodoHash {
                 }
                 this.size--;
                 this.Padre.resToSize();
+                return aux;
             }else{
                 aux.getAnterior().setSiguiente(aux.getSiguiente());
                 aux.getSiguiente().setAnterior(aux.getAnterior());
                 this.size--;
                 this.Padre.resToSize();
+                return aux;
             }
         }else{
             System.out.println("No existia ese usuario.");
+            return null;
         }
     }
     
