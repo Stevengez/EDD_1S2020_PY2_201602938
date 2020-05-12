@@ -27,4 +27,60 @@ public class Libro {
     public int getISBN(){
         return this.ISBN;
     }
+    
+    public String getTitle(){
+        return this.Title;
+    }
+    
+    public void setTitle(String Title){
+        this.Title = Title;
+    }
+    
+    public String getAuthor(){
+        return this.Name_Author;
+    }
+    
+    public void setAuthor(String Author){
+        this.Name_Author = Author;
+    }
+    
+    public String getPrinter(){
+        return this.Printer;
+    }
+    
+    public void setPrinter(String Printer){
+        this.Printer = Printer;
+    }
+    
+    public int getYear(){
+        return this.Year;
+    }
+    
+    public void setYear(int Year){
+        this.Year = Year;
+    }
+    
+    public int getEdition(){
+        return this.Edition;
+    }
+    
+    public void setEdition(int Edition){
+        this.Edition = Edition;
+    }
+    
+    public String getCategory(){
+        return this.Category;
+    }
+    
+    public String getLanguage(){
+        return this.Language;
+    }
+    
+    public void setLanguage(String Language){
+        this.Language = Language;
+    }
+    
+    public int getIDAuthor(){
+        return this.ID_Author;
+    }
 }

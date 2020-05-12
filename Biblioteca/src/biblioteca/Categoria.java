@@ -14,9 +14,11 @@ import biblioteca.Estructuras.ArbolB;
 public class Categoria {
     private String Nombre;
     private ArbolB Libros;
+    private int Publicador;
     
-    public Categoria(String Nombre){
+    public Categoria(String Nombre, int Publicador){
         this.Nombre = Nombre;
+        this.Publicador = Publicador;
         this.Libros =  new ArbolB();
     }
     
@@ -24,7 +26,15 @@ public class Categoria {
         return this.Nombre;
     }
     
+    public int getPublisher(){
+        return this.Publicador;
+    }
+    
     public void changeNombre(String newNombre){
         this.Nombre = newNombre;
+    }
+    
+    public ArbolB getLibrero(){
+        return this.Libros;
     }
 }

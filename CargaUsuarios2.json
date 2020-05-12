@@ -1,29 +1,32 @@
 {
-"DATA":[
-	{
-		"CREAR_USUARIO":[
-			{
-				"Carnet": 201602990,
-				"Nombre": "Ivan",
-				"Apellido": "Pineda",
-				"Carrera":"Ingenieria en Sistemas",
-				"Password": "Keyuser98"
-			},
-			{
-				"Carnet": 201515233,
-				"Nombre": "Jessica",
-				"Apellido": "Zapata",
-				"Carrera":"Ingenieria Industrial",
-				"Password": "Manulove0"
-			},
-			{
-				"Carnet": 201805428,
-				"Nombre": "Ronaldo",
-				"Apellido": "Rojas",
-				"Carrera":"Ingenieria en Sistemas",
-				"Password": "PazSandoval5"
-			}
-		]
-	}
-]
+	"Usuarios":[
+		{
+			"Carnet": 201503478,
+			"Nombre": "Jason",
+			"Apellido": "Batres",
+			"Carrera": "Ingenieria en Sistemas",
+			"Password": "1234@#$"
+		},
+		{
+			"Carnet": 201503447,
+			"Nombre": "Joenito",
+			"Apellido": "Hernandes",
+			"Carrera": "Ingenieria Civil",
+			"Password": "1234799"
+		},
+		{
+			"Carnet": 220005878,
+			"Nombre": "Tonioan",
+			"Apellido": "Dezherna",
+			"Carrera": "Ingenieria Electrica",
+			"Password": "654321"
+		},
+		{
+			"Carnet": 201602938,
+			"Nombre": "Steven",
+			"Apellido": "Jocol",
+			"Carrera": "Ingenieria en Sistemas",
+			"Password": "Keyuser95"
+		}
+	]
 }

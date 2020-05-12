@@ -78,6 +78,26 @@ public class Client {
         return null;
     }
 
+    public void requestAddNetworkNode(JInternalFrame Context) {
+        NodoSimple peer = NetManager.getNetworkList().getHead().getSiguiente();
+        int alcance = 0;
+        boolean correcto = true;
+        while (peer != null) {
+            connectTo(peer.getIP(), peer.getServerPort(), Context);
+            try {
+                ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
+                System.out.println("Envie una solicitud de agregar nodo a: "+peer.getIP());
+                Enviar.writeObject(Constantes.REQUEST_ADD_NETWORKNODE);
+                Enviar.writeObject(JSONCreator.addMeRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()));
+                requestCloseSocket();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            peer = peer.getSiguiente();
+            alcance++;
+        }
+    }
+
     public void requestCloseSocket() {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
@@ -90,7 +110,7 @@ public class Client {
         }
     }
 
-    public void requestAddNode(JSONObject Bloque, JInternalFrame Context) {
+    public void requestAddBlock(JSONObject Bloque, JInternalFrame Context) {
         NodoSimple peer = NetManager.getNetworkList().getHead().getSiguiente();
         int alcance = 0;
         boolean correcto = true;
@@ -116,15 +136,16 @@ public class Client {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
             alcance++;
+            peer = peer.getSiguiente();
         }
 
         if (alcance == 0) {
             JOptionPane.showMessageDialog(Context, "Eres el unico nodo, no hace falta sincronizar en la red");
-            NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, false);
+            NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, false, true);
             JSONCreator.completeBlock();
         } else {
             if (correcto) {
-                NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, false);
+                NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, false, true);
                 JSONCreator.completeBlock();
                 if (alcance > 1) {
                     JOptionPane.showMessageDialog(Context, "Sincronize con " + alcance + " nodos de la red.");
@@ -134,5 +155,4 @@ public class Client {
             }
         }
     }
-
 }

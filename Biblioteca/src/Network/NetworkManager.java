@@ -9,6 +9,7 @@ import GUI.Settings;
 import JSONCreator.Constantes;
 import biblioteca.Biblioteca;
 import biblioteca.Estructuras.ListaSimple;
+import biblioteca.Estructuras.SubNodoHash;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,6 +30,7 @@ import org.json.simple.JSONObject;
 public class NetworkManager {
 
     private volatile boolean unicoNodo, BroadCastServerON, ServerON, Synchronized;
+    private volatile SubNodoHash currentUser;
     private int ClientePort; // Puerto del Servidor del Nodo (Los otros nodos solicitaran conexion a este puerto)
     private int ServerPort; // Puerto del Cliente del Nodo (Este nodo usara este puerto para comenzar comunicacion)
     private Server Server;
@@ -197,6 +199,18 @@ public class NetworkManager {
     
     public boolean getUniqueNodeFlag(){
         return this.unicoNodo;
+    }
+    
+    public void setLoggedFlag(SubNodoHash usuario){
+        this.currentUser = usuario;
+    }
+    
+    public void setLogOutFlag(){
+        this.currentUser = null;
+    }
+    
+    public SubNodoHash getLoggedUser(){
+        return this.currentUser;
     }
     
     public void setSyncFlag() {

@@ -321,7 +321,8 @@ public class Settings extends javax.swing.JInternalFrame {
                         NetManager.getClient().requestCloseSocket();
                         NetManager.setSyncFlag();
                         Centralgui.updateLogStatus();
-                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, false, this);
+                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, null, false, this);
+                        NetManager.getClient().requestAddNetworkNode(this);
                     }else{
                         System.out.println("No se pudo conectar");
                     }

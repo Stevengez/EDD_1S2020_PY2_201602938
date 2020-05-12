@@ -44,11 +44,17 @@ public class ServerThread extends Thread {
                 ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
                 switch (Request) {
                     case Constantes.REQUEST_NETWORKNODES:
-                        Enviar.writeObject(JSONCreator.addRedOperation(JSONCreator.createBlock(), NetManager.getNetworkList()).toJSONString());
+                        Enviar.writeObject(JSONCreator.addRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()).toJSONString());
+                        break;
+                    case Constantes.REQUEST_ADD_NETWORKNODE:
+                        //Recibir = new ObjectInputStream(Client.getInputStream());
+                        JSONObject nuevoNodo = (JSONObject) Recibir.readObject();
+                        System.out.println("Solicitud de sincronizar un nuevo nodo");
+                        JSONCreator.parseDataBlock(nuevoNodo.toJSONString(), NetManager, null,null,null, true, null);
                         break;
                     case Constantes.REQUEST_ADDNODE:
                         JSONObject NuevoBloque = (JSONObject) Recibir.readObject();
-                        System.out.println("Solicitud de sincronizar un nuevo nodo");
+                        System.out.println("Solicitud de sincronizar un nuevo bloque");
                         if (JSONCreator.validateBlock(NuevoBloque, LibraryManager.getBlockChain())) {
                             System.out.println("El Nuevo Bloque es valido y debo agregarlo");
                         }else{

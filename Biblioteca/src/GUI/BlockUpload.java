@@ -32,7 +32,6 @@ public class BlockUpload extends javax.swing.JInternalFrame {
         initComponents();
         SyncProgress.setMinimum(1);
         SyncProgress.setMaximum(5);
-        
         getCurrentBlockValues();
     }
 
@@ -190,7 +189,7 @@ public class BlockUpload extends javax.swing.JInternalFrame {
         JSONObject Bloque = JSONCreator.getCurrentBlock();
         if(SyncButton.getText().equals("Preparar")){
             SyncProgress.setValue(2);
-            JSONCreator.prepareBlock(Centralgui.getVirtualLibrary().getBlockChain().getNextIndex(),Centralgui.getVirtualLibrary().getBlockChain().getLastHash());
+            JSONCreator.prepareBlock(Centralgui.getLibraryManager().getBlockChain().getNextIndex(),Centralgui.getLibraryManager().getBlockChain().getLastHash());
             SyncProgress.setValue(4);
             CurrentBlockIndex.setText(Bloque.get(Constantes.JSON_INDEX).toString());
             CurrentBlockTS.setText(Bloque.get(Constantes.JSON_TIMESTAMP).toString());
@@ -206,14 +205,15 @@ public class BlockUpload extends javax.swing.JInternalFrame {
             }
             SyncProgress.setValue(0);
         }else{
-            Centralgui.getVirtualLibrary().getNetworkManager().getClient().requestAddNode(Bloque, this);
+            Centralgui.getLibraryManager().getNetworkManager().getClient().requestAddBlock(Bloque, this);
             SyncButton.setText("Preparar");
         }
     }//GEN-LAST:event_SyncButtonActionPerformed
 
     public void getCurrentBlockValues(){
         JSONObject Bloque = JSONCreator.getCurrentBlock();
-        if(Bloque.get(Constantes.JSON_NONCE)!=null){
+        int operaciones = ((JSONArray)Bloque.get(Constantes.JSON_DATA_LABEL)).size();
+        if(Bloque.get(Constantes.JSON_NONCE)!=null && operaciones > 0){
             SyncButton.setText("Sincronizar");
             CurrentBlockIndex.setText(Bloque.get(Constantes.JSON_INDEX).toString());
             CurrentBlockTS.setText(Bloque.get(Constantes.JSON_TIMESTAMP).toString());

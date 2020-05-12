@@ -1,0 +1,25 @@
+{
+	"Usuarios":[
+		{
+			"Carnet": 201503476,
+			"Nombre": "Ricardo",
+			"Apellido": "Cutz",
+			"Carrera": "Ingenieria en Sistemas",
+			"Password": "123456"
+		},
+		{
+			"Carnet": 201503477,
+			"Nombre": "Juanito",
+			"Apellido": "Hernandez",
+			"Carrera": "Ingenieria Civil",
+			"Password": "123456"
+		},
+		{
+			"Carnet": 202005878,
+			"Nombre": "Antonio",
+			"Apellido": "Hernandez",
+			"Carrera": "Ingenieria Electrica",
+			"Password": "123456"
+		}
+	]
+}

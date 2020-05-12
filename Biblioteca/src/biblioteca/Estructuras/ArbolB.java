@@ -5,6 +5,7 @@
  */
 package biblioteca.Estructuras;
 
+import JSONCreator.JSONCreator;
 import biblioteca.Libro;
 
 /**
@@ -14,27 +15,45 @@ import biblioteca.Libro;
 public class ArbolB {
 
     private NodoB Raiz;
+    private int Size;
+    private Libro[] BooksArray;
+    private int Puntero;
 
     public ArbolB() {
         this.Raiz = new NodoB();
+        this.Size = 0;
     }
 
-    public Clave NewBook(Libro Data) {
+    public Clave NewBook(Libro Data, boolean LocalJSON) {
         Clave temp = Insert(this.Raiz, Data);
         if (temp == null) {
             return null;
         } else {
+            if (!LocalJSON) {
+                /* Agregar Operacion al Bloque */
+                JSONCreator.addBookOperation(JSONCreator.getCurrentBlock(), temp.getData());
+            }
+            this.Size++;
             //System.out.println("Listo");
             return temp;
         }
     }
 
-    public void RemoveBook(int ISBN) {
+    public NodoB getRaiz() {
+        return this.Raiz;
+    }
+
+    public void RemoveBook(int ISBN, boolean LocalJSON) {
         System.out.println("#######Eliminar: " + ISBN);
         Clave temp = Eliminar(this.Raiz, ISBN);
         if (temp == null) {
             System.out.println("No existe");
         } else {
+            this.Size--;
+            if (!LocalJSON) {
+                /* Agregar Operacion al Bloque */
+                JSONCreator.delBookOperation(JSONCreator.getCurrentBlock(), temp.getData());
+            }
             System.out.println("Eliminado");
         }
     }
@@ -51,10 +70,10 @@ public class ArbolB {
             return temp;
         } else {
             /* Reemplazar y Conectar */
-            System.out.println("Los Menores de "+Arriba.getClave()+" son: ");
+            System.out.println("Los Menores de " + Arriba.getClave() + " son: ");
             ImprimirClaves(Arriba.getMenores());
-            System.out.println("Estoy reemplazando a: "+Arriba.getClave()+" con el mayor de menores: "+Padre.maxClave().getClave());
-            
+            System.out.println("Estoy reemplazando a: " + Arriba.getClave() + " con el mayor de menores: " + Padre.maxClave().getClave());
+
             Padre.maxClave().setMayores(Arriba.getMayores());
             Padre.maxClave().setMenores(Arriba.getMenores());
             Arriba.convertTo(Padre.maxClave());
@@ -322,9 +341,9 @@ public class ArbolB {
     }
 
     public void UpdateSubLevels(NodoB Padre) {
-        if(Padre.getKey1().getMenores()!=null){
+        if (Padre.getKey1().getMenores() != null) {
             Padre.setSubNiveles(Padre.getKey1().getMenores().SubNiveles() + 1);
-        }else{
+        } else {
             Padre.setSubNiveles(0);
         }
     }
@@ -353,43 +372,42 @@ public class ArbolB {
     public void PrestamoDerecho(NodoB Deficiente, NodoB Derecho) {
         boolean noHoja = false;
         NodoB menoresNuevaCentral = null;
-        
+
         NodoB Padre = Deficiente.getPadre();
         Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Deficiente, Derecho);
         Clave NuevaCentral = Derecho.minClave();
-        if(ClaveCentral == null){
+        if (ClaveCentral == null) {
             System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
         }
-        System.out.println("Clave Superior es: "+ClaveCentral.getClave());
-        System.out.println("Clave Reemplazo es: "+NuevaCentral.getClave());
-        
-        if(NuevaCentral.getMenores()!=null){
+        System.out.println("Clave Superior es: " + ClaveCentral.getClave());
+        System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
+
+        if (NuevaCentral.getMenores() != null) {
             noHoja = true;
             menoresNuevaCentral = NuevaCentral.getMenores();
-        }else{
+        } else {
             System.out.println("Estoy en una hoja.");
-            System.out.println("La clave minima del deficientes es: "+Deficiente.minClave().getClave());
+            System.out.println("La clave minima del deficientes es: " + Deficiente.minClave().getClave());
         }
-        
+
         /* Reconectar Central */
         NuevaCentral.setMayores(ClaveCentral.getMayores());
         NuevaCentral.setMenores(ClaveCentral.getMenores());
-        
+
         /* Reconectar Deficiente */
-        if(noHoja){
+        if (noHoja) {
             ClaveCentral.setMayores(menoresNuevaCentral);
             menoresNuevaCentral.setPadre(Deficiente);
             ClaveCentral.setMenores(Deficiente.minClave().getMayores());
-        }else{
+        } else {
             ClaveCentral.setMenores(null);
             ClaveCentral.setMayores(null);
-        }        
-        
+        }
+
         /* Reemplazo de Claves */
         Derecho.deleteKey(NuevaCentral);
         Padre.deleteKey(ClaveCentral);
-        
-        
+
         /* Insertar */
         Padre.InsertNew(NuevaCentral);
         Deficiente.InsertNew(ClaveCentral);
@@ -398,41 +416,39 @@ public class ArbolB {
     public void PrestamoIzquierdo(NodoB Izquierdo, NodoB Deficiente) {
         boolean noHoja = false;
         NodoB mayoresNuevaCentral = null;
-        
+
         NodoB Padre = Deficiente.getPadre();
         Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Izquierdo, Deficiente);
         Clave NuevaCentral = Izquierdo.maxClave();
-        if(ClaveCentral == null){
+        if (ClaveCentral == null) {
             System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
         }
-        System.out.println("Clave Superior es: "+ClaveCentral.getClave());
-        System.out.println("Clave Reemplazo es: "+NuevaCentral.getClave());
-        
-        if(NuevaCentral.getMayores()!=null){
+        System.out.println("Clave Superior es: " + ClaveCentral.getClave());
+        System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
+
+        if (NuevaCentral.getMayores() != null) {
             noHoja = true;
             mayoresNuevaCentral = NuevaCentral.getMayores();
         }
-        
+
         /* Reconectar Central */
         NuevaCentral.setMayores(ClaveCentral.getMayores());
         NuevaCentral.setMenores(ClaveCentral.getMenores());
-        
+
         /* Reconectar Deficiente */
-        if(noHoja){
+        if (noHoja) {
             ClaveCentral.setMenores(mayoresNuevaCentral);
             mayoresNuevaCentral.setPadre(Deficiente);
             ClaveCentral.setMayores(Deficiente.minClave().getMenores());
-        }else{
+        } else {
             ClaveCentral.setMenores(null);
             ClaveCentral.setMayores(null);
         }
-        
-        
+
         /* Reemplazo de Claves */
         Izquierdo.deleteKey(NuevaCentral);
         Padre.deleteKey(ClaveCentral);
-        
-        
+
         /* Insertar */
         Padre.InsertNew(NuevaCentral);
         Deficiente.InsertNew(ClaveCentral);
@@ -518,11 +534,18 @@ public class ArbolB {
     public void MergeNodo(NodoB Nodo) {
         NodoB Padre, Izquierda, Derecha;
         Clave ClaveCentral;
+
         if (Nodo.getYB() != null) {
             Padre = Nodo.getPadre();
             ClaveCentral = Padre.getMiddleKeyAndChangeRight(Nodo.getYB(), Nodo);
             Izquierda = Nodo.getYB();
             Derecha = Nodo;
+            if (ClaveCentral == null) {
+                Padre = Nodo.getPadre();
+                ClaveCentral = Padre.getMiddleKey(Nodo, Nodo.getBB());
+                Izquierda = Nodo;
+                Derecha = Nodo.getBB();
+            }
         } else {
             Padre = Nodo.getPadre();
             ClaveCentral = Padre.getMiddleKey(Nodo, Nodo.getBB());
@@ -576,12 +599,12 @@ public class ArbolB {
         }
 
         if (Padre != this.Raiz || Padre.getKeySize() > 1) {
-            if(Padre.getKey1() == ClaveCentral){
+            if (Padre.getKey1() == ClaveCentral) {
                 Padre.getKey2().setMenores(Izquierda);
             }
-            
+
             Padre.deleteKey(ClaveCentral); //Borrar del nodo padre
-            
+
             Izquierda.InsertNew(ClaveCentral);
 
             /* Insertar las 2 o 1 claves de la derecha */
@@ -602,10 +625,10 @@ public class ArbolB {
             }
         } else {
             Padre.InsertNew(ClaveCentral);
-            
+
             /*Insertar las 2 o 1 claves de la Izquierda */
             Padre.InsertNew(Izquierda.getKey1());
-            if(Izquierda.getKey2()!=null){
+            if (Izquierda.getKey2() != null) {
                 Padre.InsertNew(Izquierda.getKey2());
             }
 
@@ -635,11 +658,263 @@ public class ArbolB {
     }
 
     public void ImprimirNiveles() {
-        if(this.Raiz == null){
+        if (this.Raiz == null) {
             System.out.println("El Arbol esta vacio.");
-        }else{
+        } else {
             Niveles(this.Raiz, 0);
         }
+    }
+
+    public Libro[] getBooksArray() {
+        BooksArray = new Libro[getSize()];
+        Puntero = 0;
+        ArrayEnOrder(this.Raiz);
+
+        Libro[] retorno = BooksArray;
+        BooksArray = null;
+        System.out.println("Voy a devolver un array con: " + Puntero + " libros");
+        return retorno;
+    }
+    
+    public Libro[] getBooksArray(String Filtro) {
+        BooksArray = new Libro[getSize()];
+        Puntero = 0;
+        ArrayEnOrder(this.Raiz, Filtro);
+
+        Libro[] retorno = new Libro[Puntero];
+        for(int a = 0; a<Puntero; a++){
+            retorno[a] = BooksArray[a];
+        }
+        
+        BooksArray = null;
+        System.out.println("Voy a devolver un array con: " + Puntero + " libros");
+        return retorno;
+    }
+
+    public void ArrayEnOrder(NodoB Padre) {
+        if (Padre.SubNiveles() == 0) {
+            AddtoArray(Padre);
+        } else {
+            switch (Padre.getKeySize()) {
+                case 1:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey1().getData();
+                    Puntero++;
+
+                    if (Padre.getKey1().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMayores());
+                    }
+                    break;
+                case 2:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey1().getData();
+                    Puntero++;
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey2().getData();
+                    Puntero++;
+
+                    if (Padre.getKey2().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMayores());
+                    }
+                    break;
+                case 3:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey1().getData();
+                    Puntero++;
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey2().getData();
+                    Puntero++;
+
+                    if (Padre.getKey3().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey3().getData();
+                    Puntero++;
+
+                    if (Padre.getKey3().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMayores());
+                    }
+                    break;
+                case 4:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey1().getData();
+                    Puntero++;
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey2().getData();
+                    Puntero++;
+
+                    if (Padre.getKey3().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey3().getData();
+                    Puntero++;
+
+                    if (Padre.getKey4().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey4().getMenores());
+                    }
+
+                    BooksArray[Puntero] = Padre.getKey4().getData();
+                    Puntero++;
+
+                    if (Padre.getKey4().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey4().getMayores());
+                    }
+                    break;
+                default:
+                    System.out.println("Sin programar aun este caso.");
+                    break;
+            }
+        }
+
+    }
+    
+    public void ArrayEnOrder(NodoB Padre, String Filtro) {
+        if (Padre.SubNiveles() == 0) {
+            AddtoArray(Padre, Filtro);
+        } else {
+            switch (Padre.getKeySize()) {
+                case 1:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey1().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey1().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMayores(), Filtro);
+                    }
+                    break;
+                case 2:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey1().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey2().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey2().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMayores(), Filtro);
+                    }
+                    break;
+                case 3:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey1().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey2().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey3().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey3().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey3().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMayores(), Filtro);
+                    }
+                    break;
+                case 4:
+                    if (Padre.getKey1().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey1().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey2().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey2().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey3().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey3().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey3().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey4().getMenores() != null) {
+                        ArrayEnOrder(Padre.getKey4().getMenores(), Filtro);
+                    }
+
+                    if((Filtro.matches("[0-9]+") && Padre.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey4().getData().getTitle().contains(Filtro)){
+                        BooksArray[Puntero] = Padre.getKey4().getData();
+                        Puntero++;
+                    }
+
+                    if (Padre.getKey4().getMayores() != null) {
+                        ArrayEnOrder(Padre.getKey4().getMayores(), Filtro);
+                    }
+                    break;
+                default:
+                    System.out.println("Sin programar aun este caso.");
+                    break;
+            }
+        }
+
     }
 
     public void EnOrder(NodoB Padre) {
@@ -761,7 +1036,7 @@ public class ArbolB {
         }
         System.out.println(nivel);
         System.out.println("----------------- -----------");
-        if (Izquierda.getKey1() !=null && Izquierda.getKey1().getMenores() != null) {
+        if (Izquierda.getKey1() != null && Izquierda.getKey1().getMenores() != null) {
             Niveles(Izquierda.getKey1().getMenores(), Nivel + 1);
         } else {
             System.out.println("Estoy en el nivel " + Nivel + " y ya no hay mas niveles.");
@@ -788,6 +1063,92 @@ public class ArbolB {
                 System.out.println(Nodo.getKey2().getClave());
                 System.out.println(Nodo.getKey3().getClave());
                 System.out.println(Nodo.getKey4().getClave());
+                break;
+        }
+    }
+
+    private void AddtoArray(NodoB Nodo) {
+        switch (Nodo.getKeySize()) {
+            case 1:
+                BooksArray[Puntero] = Nodo.getKey1().getData();
+                Puntero++;
+                break;
+            case 2:
+                BooksArray[Puntero] = Nodo.getKey1().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey2().getData();
+                Puntero++;
+                break;
+            case 3:
+                BooksArray[Puntero] = Nodo.getKey1().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey2().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey3().getData();
+                Puntero++;
+                break;
+            case 4:
+                BooksArray[Puntero] = Nodo.getKey1().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey2().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey3().getData();
+                Puntero++;
+                BooksArray[Puntero] = Nodo.getKey4().getData();
+                Puntero++;
+                break;
+        }
+    }
+    
+    private void AddtoArray(NodoB Nodo, String Filtro) {
+        switch (Nodo.getKeySize()) {
+            case 1:
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey1().getData();
+                    Puntero++;
+                }                
+                break;
+            case 2:
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey1().getData();
+                    Puntero++;
+                }                
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey2().getData();
+                    Puntero++;
+                }
+                break;
+            case 3:
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey1().getData();
+                    Puntero++;
+                }                
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey2().getData();
+                    Puntero++;
+                }
+                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey3().getData();
+                    Puntero++;
+                }
+                break;
+            case 4:
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey1().getData();
+                    Puntero++;
+                }                
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey2().getData();
+                    Puntero++;
+                }
+                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey3().getData();
+                    Puntero++;
+                }
+                if((Filtro.matches("[0-9]+") && Nodo.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey4().getData().getTitle().contains(Filtro)){
+                    BooksArray[Puntero] = Nodo.getKey4().getData();
+                    Puntero++;
+                }
                 break;
         }
     }
@@ -851,6 +1212,10 @@ public class ArbolB {
                 return null;
         }
         return null;
+    }
+
+    public int getSize() {
+        return this.Size;
     }
 
 }

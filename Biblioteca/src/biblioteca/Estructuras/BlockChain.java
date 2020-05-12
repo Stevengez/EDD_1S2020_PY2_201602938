@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -74,9 +75,9 @@ public class BlockChain {
                         JSONObject cargarbloque = (JSONObject) jparser.parse(bloquereader);
                         if (JSONCreator.validateBlock(cargarbloque, this)) {
                             System.out.println("Valida el bloque y lo agregue a la lissta en memoria");
-                            AddNode(cargarbloque, true);
-                        }else{
-                            System.out.println("Bloque corrupto: \n"+cargarbloque.toJSONString());
+                            AddNode(cargarbloque, true, false);
+                        } else {
+                            System.out.println("Bloque corrupto: \n" + cargarbloque.toJSONString());
                         }
                     }
 
@@ -107,16 +108,16 @@ public class BlockChain {
             Bloques.add(nuevo);
             aux = aux.getNext();
         }
-        Listado.put(Constantes.JSON_BLOCKLIST_LABEL,Bloques);
+        Listado.put(Constantes.JSON_BLOCKLIST_LABEL, Bloques);
         writeToFile(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\" + Constantes.JSON_BLOCKLIST_FILE + Constantes.JSON_BLOCKLIST_FILE_EXT, Listado.toJSONString());
     }
 
     public void writeToFile(String Path, String Contenido) {
-        OutputStream newFile = null;
+        FileWriter newFile = null;
         try {
-            newFile = new FileOutputStream(new File(Path));
-            newFile.write(Contenido.getBytes(), 0, Contenido.length());
-            newFile.close();
+            newFile = new FileWriter(new File(Path));
+            newFile.write(Contenido);
+            newFile.flush();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Settings.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -124,7 +125,7 @@ public class BlockChain {
         }
     }
 
-    public void AddNode(JSONObject Bloque, boolean LocalJSON) {
+    public void AddNode(JSONObject Bloque, boolean LocalJSON, boolean MyBlock) {
         System.out.println("Agregue un Bloque.");
         if (Inicio == null) {
             Inicio = new ChainNode(Bloque, "0000", Size);
@@ -136,12 +137,14 @@ public class BlockChain {
                         + Constantes.JSON_BLOCKLIST_FILE_EXT,
                         Bloque.toJSONString());
             }
-            JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+            if (!MyBlock) {
+                JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibreroGlobal(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+            }
             this.Size++;
         } else {
-            System.out.println("Agregando un Nodo con el HASH: "+Bloque.get(Constantes.JSON_HASH));
-            if (getNodo(Bloque.get(Constantes.JSON_HASH)+"") == null) {
-                ChainNode nuevo = new ChainNode(Bloque,(String)Bloque.get(Constantes.JSON_HASH), Size);
+            System.out.println("Agregando un Nodo con el HASH: " + Bloque.get(Constantes.JSON_HASH));
+            if (getNodo(Bloque.get(Constantes.JSON_HASH) + "") == null) {
+                ChainNode nuevo = new ChainNode(Bloque, (String) Bloque.get(Constantes.JSON_HASH), Size);
                 Final.setNext(nuevo);
                 nuevo.setPrev(Final);
                 Final = nuevo;
@@ -151,7 +154,10 @@ public class BlockChain {
                             + Constantes.JSON_BLOCKLIST_FILE_EXT,
                             Bloque.toJSONString());
                 }
-                JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+                if (!MyBlock) {
+                    JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibreroGlobal(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+                }
+
                 this.Size++;
             } else {
                 System.out.println("Ya existe este ChainNode");

@@ -29,7 +29,13 @@ public class HashTable {
     
     public SubNodoHash newUser(int Carnet, String Nombre, String Apellido, String Carrera, String Password, boolean LocalJSON){
         if (Casilleros[getLockerID(Carnet)] == null) Casilleros[getLockerID(Carnet)] = new NodoHash(this);
-        SubNodoHash nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, getMD5From(Password));
+        SubNodoHash nuevo;
+        if(LocalJSON){
+            nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, Password);
+        }else{
+            nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, getMD5From(Password));
+        }
+        
         if(!LocalJSON){
             if(nuevo != null){
                 /* Agregar Operacion al Bloque */
@@ -80,6 +86,22 @@ public class HashTable {
             Casilleros[getLockerID(Carnet)].moveTo(Carnet);
             return Casilleros[getLockerID(Carnet)].doWith();
         }
+    }
+    
+    public SubNodoHash logIn(int Carnet, String Password){
+        SubNodoHash Usuario = getUser(Carnet);
+        if(Usuario == null){ System.out.println("No Existe"); return null; }
+        
+        if(getMD5From(Password).equals(Usuario.getPassword())){
+            return Usuario;
+        }else{
+            System.out.println("Pass Real: "+Usuario.getPassword()+" Recibida: "+getMD5From(Password));
+            return null;
+        }
+    }
+    
+    public NodoHash[] getCasilleros(){
+        return this.Casilleros;
     }
     
     public void addToSize(){

@@ -42,6 +42,7 @@ public class Constantes {
     /* NETWORK REQUEST */
     
     public final static String REQUEST_NETWORKNODES = "R:NETWORKNODES";
+    public final static String REQUEST_ADD_NETWORKNODE = "R:ADDNETWORKNODE";
     public final static String REQUEST_CLOSESOCKET = "R:CLOSESOCKET";
     public final static String REQUEST_ADDNODE = "R:ADDNODE";
     public final static String REQUEST_ADDNODE_CONFIRMATION = "C:NODEADDED";
@@ -76,12 +77,32 @@ public class Constantes {
     public final static String JSON_RED_NODO_SERVERPORT = "NODO_PORT";
         
     /* JSON LABEL USUARIOS */
-    
+    public final static String JSON_CARGAMASIVA_USERLABEL = "Usuarios";
     public final static String JSON_USER_CARNET = "Carnet";
     public final static String JSON_USER_NOMBRE = "Nombre";
     public final static String JSON_USER_APELLIDO = "Apellido";
     public final static String JSON_USER_CARRERA = "Carrera";
     public final static String JSON_USER_PASSWORD = "Password";
+    
+    
+    /* JSON LABEL LIBROS */
+    
+    public final static String JSON_CARGAMASIVA_BOOKLABEL = "libros";
+    public final static String JSON_BOOK_ID_PUBLISHER = "IDPUBLISHER"; //Usuario que subio el libro
+    public final static String JSON_BOOK_ISBN = "ISBN";
+    public final static String JSON_BOOK_YEAR = "Año";
+    public final static String JSON_BOOK_LANG = "Idioma";
+    public final static String JSON_BOOK_TITLE = "Titulo";
+    public final static String JSON_BOOK_PRINTER = "Editorial";
+    public final static String JSON_BOOK_AUTHOR = "Autor";
+    public final static String JSON_BOOK_EDITION = "Edicion";
+    public final static String JSON_BOOK_CATEGORY = "Categoria";
+    
+    /* JSON LABEL CATEGORIAS */
+    
+    public final static String JSON_CATEGORY_NAME = "NOMBRE";
+    public final static String JSON_CATEGORY_AUTHOR_ID = "AUTHOR_ID";
+    
     
     /* Constantes estructuras */
     
@@ -94,6 +115,18 @@ public class Constantes {
     public final static String GUI_VENTANA_CARGA_LIBROS = "CARGALIBROS";
     public final static String GUI_VENTANA_MI_CUENTA = "MIPERFIL";
     public final static String GUI_VENTANA_SYNCBLOCK = "SINCRONIZADOR";
+    public final static String GUI_VENTANA_LOGIN = "LOG-IN";
+    public final static String GUI_VENTANA_MYPROFILE = "PROFILE";
+    public final static String GUI_VENTANA_BIBLIOTECAVIRTUAL = "BBVIRTUAL";
+    
+    public final static String GUI_VENTANA_CREAR_LIBRO = "CREARLIBRO";
+    public final static String GUI_VENTANA_CREAR_USUARIO = "CREARUSUARIO";
+    
+    public final static String GUI_VENTANA_REPORTE_USUARIOS = "REPORTEUSUARIOS";
+    public final static String GUI_VENTANA_REPORTE_AVL = "REPORTEAVL";
+    public final static String GUI_VENTANA_REPORTE_BINDIVIDUAL = "REPORTEBI";
+    public final static String GUI_VENTANA_REPORTE_BI_LISTA = "REPORTEBILISTA";
+    public final static String GUI_VENTANA_REPORTE_BGENERAL = "REPORTEBG";
     
     /* Constantes del Menu */
     
@@ -102,8 +135,8 @@ public class Constantes {
     public final static String MENU_OPCION_Bilioteca_Virtual = "VIRTUAL";
     public final static String MENU_OPCION_Bilioteca_Opciones = "CONFIG";
     public final static String MENU_OPCION_Bilioteca_salir = "SALIR";
-    public final static String MENU_OPCION_CargaMasica_Usuarios = "CUSUARIOS";
-    public final static String MENU_OPCION_CargaMasica_Libros = "CLIBROS";
+    public final static String MENU_OPCION_CargaMasiva_Usuarios = "CLIBROS";
+    public final static String MENU_OPCION_CargaMasiva_Libros = "CUSUARIOS";
     public final static String MENU_OPCION_Reportes_ArbolAVL = "RAVL";
     public final static String MENU_OPCION_Reportes_ArbolB = "RB";
     public final static String MENU_OPCION_Reportes_TablaHash = "RT";

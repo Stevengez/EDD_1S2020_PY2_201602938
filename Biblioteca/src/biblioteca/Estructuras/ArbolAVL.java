@@ -5,7 +5,9 @@
  */
 package biblioteca.Estructuras;
 
+import JSONCreator.JSONCreator;
 import biblioteca.Categoria;
+import biblioteca.Libro;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,6 +25,8 @@ public class ArbolAVL {
     private int Altura;
     private String PreOrderString;
     private int PreOrderInt;
+    private Categoria[] AllCategory;
+    private int Size, Puntero;
 
     public ArbolAVL() {
         this.Raiz = null;
@@ -33,19 +37,32 @@ public class ArbolAVL {
         return this.Raiz;
     }
 
-    public NodoAVL InsertNew(Categoria Data) {
+    public NodoAVL InsertNew(Categoria Data, boolean LocalJSON) {
+
         if (Raiz == null) {
             NodoAVL nuevo = new NodoAVL(Data);
             Raiz = nuevo;
             System.out.println("Cree la Raiz: " + nuevo.getData().getNombre());
+            this.Size++;
+
+            if (!LocalJSON) {
+                /* Agregar Operacion al Bloque */
+                JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), nuevo.getData());
+            }
+
             return nuevo;
         } else {
-            NodoAVL temp = Insert(Raiz, Data);
-            if (temp == null) {
+            NodoAVL nuevo = Insert(Raiz, Data);
+            if (nuevo == null) {
                 System.out.println("Ya existe esta categoria.");
                 return null;
             } else {
-                return temp;
+                this.Size++;
+                if (!LocalJSON) {
+                    /* Agregar Operacion al Bloque */
+                    JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), nuevo.getData());
+                }
+                return nuevo;
             }
         }
     }
@@ -138,13 +155,27 @@ public class ArbolAVL {
     }
 
     /* ---------------- BUSQUEDA DE NODOS ---------------- */
-    public NodoAVL BuscarNodo(String Categoria) {
+    public NodoAVL BuscarCategoria(String Categoria) {
         if (this.Raiz == null) {
             return null;
         } else {
-            NodoAVL temp = Buscar(Raiz, new Categoria(Categoria));
+            NodoAVL temp = Buscar(Raiz, new Categoria(Categoria, 0));
             if (temp == null) {
                 System.out.println("No se encontro esa categoria.");
+            }
+            return temp;
+        }
+
+    }
+
+    /* ---------------- BUSQUEDA Y CREACION NODOS ---------------- */
+    public NodoAVL BuscarYCrear(String Categoria, int Carnet, boolean LocalJSON) {
+        if (this.Raiz == null) {
+            return InsertNew(new Categoria(Categoria, Carnet), LocalJSON);
+        } else {
+            NodoAVL temp = Buscar(Raiz, new Categoria(Categoria, 0));
+            if (temp == null) {
+                return InsertNew(new Categoria(Categoria, Carnet), LocalJSON);
             }
             return temp;
         }
@@ -188,12 +219,36 @@ public class ArbolAVL {
         }
     }
 
-    public void EliminarNodo(String Categoria) {
-        NodoAVL temp = Eliminar(this.Raiz, new Categoria(Categoria));
+    public Libro[] EliminarNodo(String Categoria, boolean LocalJSON) {
+        NodoAVL temp = Eliminar(this.Raiz, new Categoria(Categoria, 0));
         if (temp == null) {
-
+            System.out.println("No Existia la categoria");
+            return null;
+        } else {
+            this.Size--;
+            
+            /* Eliminacion de libros Prior Delete Category */
+            
+            Libro[] eliminar_libros = temp.getData().getLibrero().getBooksArray();
+            
+            if(eliminar_libros.length>0){
+                for(int x = 0; x<eliminar_libros.length;x++){
+                    temp.getData().getLibrero().RemoveBook(eliminar_libros[x].getISBN(), LocalJSON);
+                }
+                if (!LocalJSON) {
+                /* Agregar Operacion al Bloque */
+                JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
+                }
+                
+                return eliminar_libros;
+            }else{
+                if (!LocalJSON) {
+                /* Agregar Operacion al Bloque */
+                JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
+                }
+                return null;
+            }
         }
-
     }
 
     public NodoAVL Eliminar(NodoAVL Padre, Categoria Data) {
@@ -484,6 +539,12 @@ public class ArbolAVL {
         RSD(Nodo);
         System.out.println("Termine la rotacion (RDD)");
     }
+    
+    /* ------------------------ Get Size --------------------------- */
+    
+    public int getSize(){
+        return this.Size;
+    }
 
     /* ---------------- Impresion Grafica del Arbol ---------------- */
     public void ImpresoraGrafica() {
@@ -551,14 +612,38 @@ public class ArbolAVL {
         EnOrder(Raiz);
 
     }
+    
+    public Categoria[] getCatsArray(){
+        AllCategory = new Categoria[getSize()];
+        Puntero = 0;
+        if(Raiz == null) return null;
+        EnOrderArray(Raiz);
+        System.out.println("Agrupe "+Puntero+" categorias");
+        return AllCategory;
+    }
 
     public void EnOrder(NodoAVL Padre) {
         System.out.println(Padre.getData().getNombre() + ": " + Padre.getSubLevels() + " BFact: " + Padre.getBFact());
+        
         if (Padre.getIzquierda() != null) {
             EnOrder(Padre.getIzquierda());
         }
         if (Padre.getDerecha() != null) {
             EnOrder(Padre.getDerecha());
+        }
+    }
+    
+    public void EnOrderArray(NodoAVL Padre){
+                
+        if (Padre.getIzquierda() != null) {
+            EnOrderArray(Padre.getIzquierda());
+        }
+        
+        AllCategory[Puntero] = Padre.getData();
+        Puntero++;
+        
+        if (Padre.getDerecha() != null) {
+            EnOrderArray(Padre.getDerecha());
         }
     }
 }
