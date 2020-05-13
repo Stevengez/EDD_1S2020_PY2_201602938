@@ -83,6 +83,11 @@ public class ReporteTH extends javax.swing.JInternalFrame {
         ImagenUsuarios.setBackground(java.awt.SystemColor.controlLtHighlight);
         ImagenUsuarios.setText("jLabel1");
         ImagenUsuarios.setOpaque(true);
+        ImagenUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ImagenUsuariosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(ImagenUsuarios);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -98,6 +103,13 @@ public class ReporteTH extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void ImagenUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ImagenUsuariosMouseClicked
+        imagen_ruta = this.LibraryManager.getImpresora().ImprimirUsuarios();
+        System.out.println("La imagen esta en: "+imagen_ruta);
+        ImagenUsuarios.setIcon(new ImageIcon(imagen_ruta));   
+        ImagenUsuarios.setText("");
+    }//GEN-LAST:event_ImagenUsuariosMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.charset.StandardCharsets;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -98,7 +99,7 @@ public class CargaLibros extends javax.swing.JInternalFrame {
             
                 FileReader reader;
             try {
-                reader = new FileReader(CargaMasivaLibros.getSelectedFile().getAbsolutePath());
+                reader = new FileReader(CargaMasivaLibros.getSelectedFile().getAbsolutePath(), StandardCharsets.UTF_8);
                 JSONParser jparser = new JSONParser();
                 JSONObject Data = (JSONObject) jparser.parse(reader);
                 JSONCreator.parseCargaLibros(Data,NetManager,Centralgui.getLibraryManager().getLibrero(), Centralgui.getLibraryManager().getLibreroGlobal(),this);

@@ -48,8 +48,16 @@ public class SubNodoHash {
         return this.Nombre;
     }
     
+    public void setNombre(String Nombre){
+        this.Nombre = Nombre;
+    }
+    
     public String getApellido(){
         return this.Apellido;
+    }
+    
+    public void setApellido(String Apellido){
+        this.Apellido = Apellido;
     }
     
     public String getFullName(){
@@ -60,8 +68,16 @@ public class SubNodoHash {
         return this.Carrera;
     }
     
+    public void setCarrera(String Carrera){
+        this.Carrera = Carrera;
+    }
+    
     public String getPassword(){
         return this.Password;
+    }
+    
+    public void setPassword(String Password){
+        this.Password = Password;
     }
     
     public SubNodoHash getSiguiente(){

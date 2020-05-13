@@ -226,25 +226,24 @@ public class ArbolAVL {
             return null;
         } else {
             this.Size--;
-            
+
             /* Eliminacion de libros Prior Delete Category */
-            
             Libro[] eliminar_libros = temp.getData().getLibrero().getBooksArray();
-            
-            if(eliminar_libros.length>0){
-                for(int x = 0; x<eliminar_libros.length;x++){
+
+            if (eliminar_libros.length > 0) {
+                for (int x = 0; x < eliminar_libros.length; x++) {
                     temp.getData().getLibrero().RemoveBook(eliminar_libros[x].getISBN(), LocalJSON);
                 }
                 if (!LocalJSON) {
-                /* Agregar Operacion al Bloque */
-                JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
+                    /* Agregar Operacion al Bloque */
+                    JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
                 }
-                
+
                 return eliminar_libros;
-            }else{
+            } else {
                 if (!LocalJSON) {
-                /* Agregar Operacion al Bloque */
-                JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
+                    /* Agregar Operacion al Bloque */
+                    JSONCreator.delCategoryOperation(JSONCreator.getCurrentBlock(), temp.getData());
                 }
                 return null;
             }
@@ -539,10 +538,9 @@ public class ArbolAVL {
         RSD(Nodo);
         System.out.println("Termine la rotacion (RDD)");
     }
-    
+
     /* ------------------------ Get Size --------------------------- */
-    
-    public int getSize(){
+    public int getSize() {
         return this.Size;
     }
 
@@ -612,19 +610,38 @@ public class ArbolAVL {
         EnOrder(Raiz);
 
     }
-    
-    public Categoria[] getCatsArray(){
+
+    public Categoria[] getCatsArray() {
         AllCategory = new Categoria[getSize()];
         Puntero = 0;
-        if(Raiz == null) return null;
+        if (Raiz == null) {
+            return null;
+        }
         EnOrderArray(Raiz);
-        System.out.println("Agrupe "+Puntero+" categorias");
+        System.out.println("Agrupe " + Puntero + " categorias");
         return AllCategory;
+    }
+
+    public Categoria[] getCatsArray(int Carnet) {
+        AllCategory = new Categoria[getSize()];
+        Puntero = 0;
+        if (Raiz == null) {
+            return null;
+        }
+        EnOrderArray(Raiz, Carnet);
+        
+        Categoria[] retorno = new Categoria[Puntero];
+        for(int a=0;a<Puntero;a++){
+            retorno[a] = AllCategory[a];
+        }
+        AllCategory = null;
+        System.out.println("Agrupe " + Puntero + " categorias con filtro");
+        return retorno;
     }
 
     public void EnOrder(NodoAVL Padre) {
         System.out.println(Padre.getData().getNombre() + ": " + Padre.getSubLevels() + " BFact: " + Padre.getBFact());
-        
+
         if (Padre.getIzquierda() != null) {
             EnOrder(Padre.getIzquierda());
         }
@@ -632,18 +649,44 @@ public class ArbolAVL {
             EnOrder(Padre.getDerecha());
         }
     }
-    
-    public void EnOrderArray(NodoAVL Padre){
-                
+
+    public void EnOrderArray(NodoAVL Padre) {
+
         if (Padre.getIzquierda() != null) {
             EnOrderArray(Padre.getIzquierda());
         }
-        
+
         AllCategory[Puntero] = Padre.getData();
         Puntero++;
-        
+
         if (Padre.getDerecha() != null) {
             EnOrderArray(Padre.getDerecha());
+        }
+    }
+
+    /* Con Filtro */
+    public void EnOrderArray(NodoAVL Padre, int Carnet) {
+
+        if (Padre.getIzquierda() != null) {
+            EnOrderArray(Padre.getIzquierda(), Carnet);
+        }
+
+        Libro[] libros = Padre.getData().getLibrero().getBooksArray();
+        boolean put_this_cat = false;
+        if (libros != null) {
+            for (int l = 0; l < libros.length; l++) {
+                if (libros[l].getIDAuthor() == Carnet) {
+                    put_this_cat = true;
+                }
+            }
+            if (put_this_cat) {
+                AllCategory[Puntero] = Padre.getData();
+                Puntero++;
+            }
+        }
+
+        if (Padre.getDerecha() != null) {
+            EnOrderArray(Padre.getDerecha(), Carnet);
         }
     }
 }

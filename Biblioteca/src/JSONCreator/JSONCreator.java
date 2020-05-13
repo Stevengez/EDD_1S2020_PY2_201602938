@@ -126,7 +126,6 @@ public class JSONCreator {
 
             for (Object Operacion : Data) {
                 JSONObject operacion = (JSONObject) Operacion;
-                int adser = 0, adlib = 0, duser = 0, dulib = 0;
                 for (Object ID : operacion.keySet()) {
                     switch ((String) ID) {
                         case Constantes.JSON_RED_ADD:
@@ -136,7 +135,7 @@ public class JSONCreator {
                                 NetManager.getNetworkList().AddNetNode(servidorRemoto.get(Constantes.JSON_RED_NODO_IP).toString(), Integer.parseInt(servidorRemoto.get(Constantes.JSON_RED_NODO_SERVERPORT).toString()));
                             }
                             if (NetManager.getNetworkList().getNodeSize() > 1) {
-                                NetManager.setUniqueNodeFlag();
+                                NetManager.setUniqueNodeFalse();
                             }
                             break;
                         case Constantes.JSON_RED_DELETE:
@@ -151,7 +150,6 @@ public class JSONCreator {
                         case Constantes.JSON_USUARIOS_ADD:
                             JSONArray AddUser = (JSONArray) operacion.get(ID);
                             for (Object nodo : AddUser) {
-                                adser++;
                                 JSONObject usuario = (JSONObject) nodo;
                                 Usuarios.newUser(
                                         Integer.parseInt(usuario.get(Constantes.JSON_USER_CARNET).toString()),
@@ -162,8 +160,20 @@ public class JSONCreator {
                                         LocalJSON);
                             }
                             break;
+                        case Constantes.JSON_USUARIOS_EDIT:
+                            JSONArray EditUser = (JSONArray) operacion.get(ID);
+                            for (Object nodo : EditUser) {
+                                JSONObject usuario = (JSONObject) nodo;
+                                SubNodoHash editado = Usuarios.getUser(Integer.parseInt(usuario.get(Constantes.JSON_USER_CARNET).toString()));
+                                if(editado!=null){
+                                    editado.setNombre(usuario.get(Constantes.JSON_USER_NOMBRE).toString());
+                                    editado.setApellido(usuario.get(Constantes.JSON_USER_APELLIDO).toString());
+                                    editado.setCarrera(usuario.get(Constantes.JSON_USER_CARRERA).toString());
+                                    editado.setPassword(usuario.get(Constantes.JSON_USER_PASSWORD).toString());
+                                }
+                            }
+                            break;
                         case Constantes.JSON_USUARIOS_DELETE:
-                            duser++;
                             JSONArray DelUser = (JSONArray) operacion.get(ID);
                             for (Object nodo : DelUser) {
                                 JSONObject usuario = (JSONObject) nodo;
@@ -192,7 +202,7 @@ public class JSONCreator {
                                         libro.get(Constantes.JSON_BOOK_LANG).toString(),
                                         Integer.parseInt(libro.get(Constantes.JSON_BOOK_ID_PUBLISHER).toString()));
 
-                                Clave libro_general = LibreroGeneral.NewBook(nuevo_libro, LocalJSON);
+                                Clave libro_general = LibreroGeneral.NewBook(nuevo_libro, true);
 
                                 if (libro_general != null) {
                                     NodoAVL categoria = Librero.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), Integer.parseInt(libro.get(Constantes.JSON_BOOK_ID_PUBLISHER).toString()), LocalJSON);
@@ -200,11 +210,34 @@ public class JSONCreator {
                                 }
                             }
                             break;
+                        case Constantes.JSON_BOOKS_EDIT:
+                            JSONArray EditBook = (JSONArray) operacion.get(ID);
+                            for (Object nodo : EditBook) {
+                                JSONObject libro = (JSONObject) nodo;
+                                Clave editado = LibreroGeneral.getBook(Integer.parseInt(libro.get(Constantes.JSON_BOOK_ISBN).toString()));
+                                if(editado !=null){
+                                    editado.getData().setTitle(libro.get(Constantes.JSON_BOOK_TITLE).toString());
+                                    editado.getData().setAuthor(libro.get(Constantes.JSON_BOOK_AUTHOR).toString());
+                                    editado.getData().setLanguage(libro.get(Constantes.JSON_BOOK_LANG).toString());
+                                    editado.getData().setPrinter(libro.get(Constantes.JSON_BOOK_PRINTER).toString());
+                                    editado.getData().setEdition(Integer.parseInt(libro.get(Constantes.JSON_BOOK_EDITION).toString()));
+                                    editado.getData().setYear(Integer.parseInt(libro.get(Constantes.JSON_BOOK_YEAR).toString()));
+                                    
+                                    editado = Librero.BuscarCategoria(libro.get(Constantes.JSON_BOOK_CATEGORY).toString()).getData().getLibrero().getBook(Integer.parseInt(libro.get(Constantes.JSON_BOOK_ISBN).toString()));
+                                    editado.getData().setTitle(libro.get(Constantes.JSON_BOOK_TITLE).toString());
+                                    editado.getData().setAuthor(libro.get(Constantes.JSON_BOOK_AUTHOR).toString());
+                                    editado.getData().setLanguage(libro.get(Constantes.JSON_BOOK_LANG).toString());
+                                    editado.getData().setPrinter(libro.get(Constantes.JSON_BOOK_PRINTER).toString());
+                                    editado.getData().setEdition(Integer.parseInt(libro.get(Constantes.JSON_BOOK_EDITION).toString()));
+                                    editado.getData().setYear(Integer.parseInt(libro.get(Constantes.JSON_BOOK_YEAR).toString()));
+                                }
+                            }
+                            break;
                         case Constantes.JSON_BOOKS_DELETE:
                             JSONArray DelBook = (JSONArray) operacion.get(ID);
                             for (Object nodo : DelBook) {
                                 JSONObject libro = (JSONObject) nodo;
-                                LibreroGeneral.RemoveBook(Integer.parseInt(libro.get(Constantes.JSON_BOOK_ISBN).toString()), LocalJSON);
+                                LibreroGeneral.RemoveBook(Integer.parseInt(libro.get(Constantes.JSON_BOOK_ISBN).toString()), true);
                                 NodoAVL cat = Librero.BuscarCategoria(libro.get(Constantes.JSON_BOOK_CATEGORY).toString());
                                 if (cat != null) {
                                     cat.getData().getLibrero().RemoveBook(Integer.parseInt(libro.get(Constantes.JSON_BOOK_ISBN).toString()), LocalJSON);
@@ -215,22 +248,6 @@ public class JSONCreator {
                             System.out.println("Llave no identificada: " + (String) ID);
                             break;
                     }
-                }
-                String Mensaje = "";
-                if (adser > 0) {
-                    Mensaje = Mensaje + "Se agregaron " + adser + " Usuarios.\n";
-                }
-                if (duser > 0) {
-                    Mensaje = Mensaje + "Se eliminaron " + duser + " Usuarios.\n";
-                }
-                if (adlib > 0) {
-                    Mensaje = Mensaje + "Se agregaron " + adser + " Libros.\n";
-                }
-                if (dulib > 0) {
-                    Mensaje = Mensaje + "Se eliminaron " + duser + " Libros.\n";
-                }
-                if (!LocalJSON) {
-                    JOptionPane.showMessageDialog(Context, Mensaje);
                 }
             }
         } catch (ParseException ex) {
@@ -282,7 +299,7 @@ public class JSONCreator {
                     libro.get(Constantes.JSON_BOOK_LANG).toString(),
                     NetManager.getLoggedUser().getCarnet());
 
-            Clave libro_general = GeneralLibrary.NewBook(nuevo_libro, false);
+            Clave libro_general = GeneralLibrary.NewBook(nuevo_libro, true);
 
             if (libro_general != null) {
                 NodoAVL categoria = CatLibrary.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), NetManager.getLoggedUser().getCarnet(), false);
@@ -365,6 +382,23 @@ public class JSONCreator {
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
         return Bloque;
     }
+    
+    public static JSONObject editUserOperation(JSONObject Bloque, SubNodoHash Usuario) {
+        JSONObject Operacion = new JSONObject();
+        JSONArray editUser = new JSONArray();
+        System.out.println("Edite un usuario a la operacion: " + Usuario.getNombre());
+        JSONObject User = new JSONObject();
+        User.put(Constantes.JSON_USER_CARNET, Usuario.getCarnet());
+        User.put(Constantes.JSON_USER_NOMBRE, Usuario.getNombre());
+        User.put(Constantes.JSON_USER_APELLIDO, Usuario.getApellido());
+        User.put(Constantes.JSON_USER_CARRERA, Usuario.getCarrera());
+        User.put(Constantes.JSON_USER_PASSWORD, Usuario.getPassword());
+        editUser.add(User);
+
+        Operacion.put(Constantes.JSON_USUARIOS_EDIT, editUser);
+        ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        return Bloque;
+    }
 
     public static JSONObject delUserOperation(JSONObject Bloque, SubNodoHash Usuario) {
         JSONObject Operacion = new JSONObject();
@@ -428,6 +462,26 @@ public class JSONCreator {
         addBook.add(Book);
 
         Operacion.put(Constantes.JSON_BOOKS_ADD, addBook);
+        ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        return Bloque;
+    }
+    
+    public static JSONObject editBookOperation(JSONObject Bloque, Libro libro) {
+        JSONObject Operacion = new JSONObject();
+        JSONArray addBook = new JSONArray();
+
+        System.out.println("Agregue una edicion de libro a la operacion: " + libro.getTitle());
+        JSONObject Book = new JSONObject();
+        Book.put(Constantes.JSON_BOOK_YEAR, libro.getYear());
+        Book.put(Constantes.JSON_BOOK_LANG, libro.getLanguage());
+        Book.put(Constantes.JSON_BOOK_TITLE, libro.getTitle());
+        Book.put(Constantes.JSON_BOOK_PRINTER, libro.getPrinter());
+        Book.put(Constantes.JSON_BOOK_CATEGORY, libro.getCategory());
+        Book.put(Constantes.JSON_BOOK_AUTHOR, libro.getAuthor());
+        Book.put(Constantes.JSON_BOOK_EDITION, libro.getEdition());
+        addBook.add(Book);
+
+        Operacion.put(Constantes.JSON_BOOKS_EDIT, addBook);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
         return Bloque;
     }

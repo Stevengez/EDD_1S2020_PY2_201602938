@@ -6,7 +6,6 @@
     <Property name="iconifiable" type="boolean" value="true"/>
     <Property name="maximizable" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="true"/>
-    <Property name="title" type="java.lang.String" value="Biblioteca Virtual"/>
     <Property name="visible" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
@@ -43,7 +42,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="FIltroPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="ScrollContainer" pref="186" max="32767" attributes="0"/>
+              <Component id="ScrollContainer" pref="228" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -76,7 +75,7 @@
                       <Component id="Buscar" pref="102" max="32767" attributes="0"/>
                       <Component id="EliminarCategoria" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="166" max="32767" attributes="0"/>
+                  <EmptySpace pref="176" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -112,7 +111,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Buscar Libro por Nombre: "/>
+            <Property name="text" type="java.lang.String" value="Buscar por Titulo/ISBN: "/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="BusquedaInput">

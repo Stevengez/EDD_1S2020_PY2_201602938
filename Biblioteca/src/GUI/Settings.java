@@ -313,16 +313,36 @@ public class Settings extends javax.swing.JInternalFrame {
                     errores = errores + "El Puerto de sincronizacion es invalido o esta vacio.\n";
                 }
 
-                if (!"".equals(errores)) {
+                if (!errores.equals("")) {
                     JOptionPane.showMessageDialog(this, errores);
                 }else{
                     if(NetManager.getClient().connectTo(IPSyncInput.getText(),Integer.parseInt(PortSyncInput.getText()), this)){
+                        
+                        /* Manejar Nodos de la Red */
+                        
                         String Respuesta = NetManager.getClient().requestNetworkNodes();
                         NetManager.getClient().requestCloseSocket();
+                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, null, false, this);
+                        
+                        /* Registrarse en todos los nodos de la red */
+                        
+                        NetManager.getClient().requestAddNetworkNode(this);
+                        
+                        
+                        /* Solicitar todos los blockes pendientes */
+                        
+                        if(NetManager.getClient().connectTo(IPSyncInput.getText(),Integer.parseInt(PortSyncInput.getText()), this)){
+                            NetManager.getClient().requestBlockSince(NetManager.getLibraryManager().getBlockChain().getNextIndex(),this);
+                        }
+                        
+                        /* Estado Sincronizado */
+                        
                         NetManager.setSyncFlag();
                         Centralgui.updateLogStatus();
-                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, null, false, this);
-                        NetManager.getClient().requestAddNetworkNode(this);
+                        
+                        JOptionPane.showMessageDialog(this, "Sincronizacion Completa");
+                        this.hide();
+                        
                     }else{
                         System.out.println("No se pudo conectar");
                     }

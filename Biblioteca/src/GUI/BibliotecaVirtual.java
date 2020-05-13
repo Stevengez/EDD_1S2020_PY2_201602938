@@ -12,6 +12,7 @@ import biblioteca.Libro;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -33,7 +34,14 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
     public BibliotecaVirtual(CentralGUI Centralgui, boolean Global) {
         this.Centralgui = Centralgui;
         this.Global = Global;
-        setName(Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+        if (Global) {
+            setTitle("Biblioteca Virtual");
+            setName(Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+        } else {
+            setTitle("Mi Biblioteca Virtual ("+Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getNombre()+")");
+            setName(Constantes.GUI_VENTANA_MI_BIBLIOTECAVIRTUAL);
+        }
+
         initComponents();
 
         setJMenuBar(crearMenu());
@@ -64,12 +72,11 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Biblioteca Virtual");
         setVisible(true);
 
         FIltroPanel.setBackground(java.awt.SystemColor.info);
 
-        jLabel1.setText("Buscar Libro por Nombre: ");
+        jLabel1.setText("Buscar por Titulo/ISBN: ");
 
         BusquedaInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -122,7 +129,7 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
                 .addGroup(FIltroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(Buscar, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                     .addComponent(EliminarCategoria, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(166, Short.MAX_VALUE))
+                .addContainerGap(176, Short.MAX_VALUE))
         );
         FIltroPanelLayout.setVerticalGroup(
             FIltroPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,7 +172,7 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
                 .addContainerGap()
                 .addComponent(FIltroPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ScrollContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                .addComponent(ScrollContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -258,13 +265,22 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
     private JMenuBar crearMenu() {
         JMenuBar menu_superior = new JMenuBar();
         JMenu menu_opcion_Opciones = new JMenu("Opciones");
+        
+        JMenuItem menu_opcion_cuenta = new JMenuItem("Mi Cuenta");
         JMenuItem menu_opcion_crear = new JMenuItem("Crear Libro");
-        menu_opcion_Opciones.addActionListener(this);
+        
+        menu_opcion_cuenta.setActionCommand(Constantes.MENU_OPCION_Bilioteca_MyProfile);
+        menu_opcion_crear.setActionCommand(Constantes.MENU_OPCION_Bilioteca_Create_NewBook);
+        
+        menu_opcion_cuenta.addActionListener(this);
+        menu_opcion_crear.addActionListener(this);
 
         if (Global) {
             menu_opcion_crear.setEnabled(false);
+            menu_opcion_cuenta.setEnabled(false);
         }
 
+        menu_opcion_Opciones.add(menu_opcion_cuenta);
         menu_opcion_Opciones.add(menu_opcion_crear);
         menu_superior.add(menu_opcion_Opciones);
         return menu_superior;
@@ -286,7 +302,12 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
                 }
             }
         } else {
-            CatList.setEnabled(false);
+            cats = Centralgui.getLibraryManager().getLibrero().getCatsArray(Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getCarnet());
+            if (cats != null) {
+                for (int x = 0; x < cats.length; x++) {
+                    CatList.addItem(cats[x].getNombre());
+                }
+            }
         }
     }
 
@@ -320,7 +341,29 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        switch (e.getActionCommand()) {
+            case Constantes.MENU_OPCION_Bilioteca_MyProfile:
+                JInternalFrame Mi_Perfil = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+                if (Mi_Perfil != null) {
+                    Centralgui.ActivateFrame(Mi_Perfil);
+                } else {
+                    Mi_Perfil = new MiPerfil(Centralgui, this);
+                    Centralgui.getDesktop().add(Mi_Perfil);
+                    Centralgui.ActivateFrame(Mi_Perfil);
+                }
+                break;
+            case Constantes.MENU_OPCION_Bilioteca_Create_NewBook:
+                    CrearLibro Nuevo_Libro;
+                    if(CatList.getSelectedIndex()==0){
+                         Nuevo_Libro = new CrearLibro(Centralgui);
+                    }else{
+                        Nuevo_Libro = new CrearLibro(Centralgui, cats[CatList.getSelectedIndex()-1].getNombre());
+                    }
+                    Centralgui.getDesktop().add(Nuevo_Libro);
+                    Centralgui.ActivateFrame(Nuevo_Libro);
+                break;
+                
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

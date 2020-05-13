@@ -9,6 +9,7 @@ import GUI.Settings;
 import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
 import biblioteca.Biblioteca;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,6 +17,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
@@ -61,7 +65,7 @@ public class BlockChain {
         if (lista.exists()) {
             System.out.println("BlockCHain:: Ya Existe el listado de Bloques.");
             try {
-                reader = new FileReader(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\" + Constantes.JSON_BLOCKLIST_FILE + Constantes.JSON_BLOCKLIST_FILE_EXT);
+                reader = new FileReader(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\" + Constantes.JSON_BLOCKLIST_FILE + Constantes.JSON_BLOCKLIST_FILE_EXT,StandardCharsets.UTF_8);
                 JSONParser jparser = new JSONParser();
                 JSONObject Bloque = (JSONObject) jparser.parse(reader);
                 JSONArray Listado = (JSONArray) Bloque.get(Constantes.JSON_BLOCKLIST_LABEL);
@@ -71,7 +75,7 @@ public class BlockChain {
                     File bloqueactual = new File(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\" + ((JSONObject) bloque).get(Constantes.JSON_BLOCKLIST_ARRAY_FILENAME));
                     if (bloqueactual.exists()) {
                         System.out.println("El bloque del listado existia.");
-                        FileReader bloquereader = new FileReader(bloqueactual);
+                        FileReader bloquereader = new FileReader(bloqueactual,StandardCharsets.UTF_8);
                         JSONObject cargarbloque = (JSONObject) jparser.parse(bloquereader);
                         if (JSONCreator.validateBlock(cargarbloque, this)) {
                             System.out.println("Valida el bloque y lo agregue a la lissta en memoria");
@@ -82,6 +86,7 @@ public class BlockChain {
                     }
 
                 }
+                System.out.println("EL INDEX ACTUAL ES: "+getNextIndex());
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(BlockChain.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -115,11 +120,17 @@ public class BlockChain {
     public void writeToFile(String Path, String Contenido) {
         FileWriter newFile = null;
         try {
-            newFile = new FileWriter(new File(Path));
+            
+            newFile = new FileWriter(new File(Path),StandardCharsets.UTF_8);
             newFile.write(Contenido);
             newFile.flush();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Settings.class.getName()).log(Level.SEVERE, null, ex);
+            /*
+            Writer fstream = null;
+            BufferedWriter out = null;
+            fstream = new OutputStreamWriter(new FileOutputStream(Path), StandardCharsets.UTF_8);
+            fstream.write(Contenido);
+            fstream.close();
+            */
         } catch (IOException ex) {
             Logger.getLogger(Settings.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -163,6 +174,59 @@ public class BlockChain {
                 System.out.println("Ya existe este ChainNode");
             }
         }
+    }
+    
+    public void AddNode(JSONObject Bloque, boolean LocalJSON, boolean MyBlock, boolean FromPeer) {
+        System.out.println("Agregue un Bloque.");
+        if (Inicio == null) {
+            Inicio = new ChainNode(Bloque, "0000", Size);
+            Final = Inicio;
+            if (FromPeer) {
+                writeToFile(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\"
+                        + Constantes.JSON_BLOCKLIST_FILE_PREFIX
+                        + this.Size
+                        + Constantes.JSON_BLOCKLIST_FILE_EXT,
+                        Bloque.toJSONString());
+            }
+            if (!MyBlock) {
+                JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibreroGlobal(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+            }
+            this.Size++;
+        } else {
+            System.out.println("Agregando un Nodo con el HASH: " + Bloque.get(Constantes.JSON_HASH));
+            if (getNodo(Bloque.get(Constantes.JSON_HASH) + "") == null) {
+                ChainNode nuevo = new ChainNode(Bloque, (String) Bloque.get(Constantes.JSON_HASH), Size);
+                Final.setNext(nuevo);
+                nuevo.setPrev(Final);
+                Final = nuevo;
+                if (FromPeer) {
+                    writeToFile(currentDir + "\\" + Constantes.JSON_BLOCKLIST_FOLDER + "\\"
+                            + Constantes.JSON_BLOCKLIST_FILE_PREFIX + this.Size
+                            + Constantes.JSON_BLOCKLIST_FILE_EXT,
+                            Bloque.toJSONString());
+                }
+                if (!MyBlock) {
+                    JSONCreator.parseDataBlock(Bloque.toJSONString(), LibraryManager.getNetworkManager(), LibraryManager.getLibreroGlobal(), LibraryManager.getLibrero(), LibraryManager.getUsuarios(), LocalJSON, null);
+                }
+
+                this.Size++;
+            } else {
+                System.out.println("Ya existe este ChainNode");
+            }
+        }
+    }
+    
+    public ChainNode getIndex(int Index){
+        ChainNode temp = this.Inicio;
+        while(temp!=null){
+            if(temp.getIndex()==Index) return temp;
+            temp = temp.getNext();
+        }
+        return null;
+    }
+    
+    public ChainNode getHead(){
+        return this.Inicio;
     }
 
     public ChainNode getNodo(String Sha256) {

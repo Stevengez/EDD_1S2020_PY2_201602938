@@ -8,6 +8,7 @@ package Network;
 import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
 import biblioteca.Biblioteca;
+import biblioteca.Estructuras.ChainNode;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,6 +52,16 @@ public class ServerThread extends Thread {
                         JSONObject nuevoNodo = (JSONObject) Recibir.readObject();
                         System.out.println("Solicitud de sincronizar un nuevo nodo");
                         JSONCreator.parseDataBlock(nuevoNodo.toJSONString(), NetManager, null,null,null, true, null);
+                        break;
+                    case Constantes.REQUEST_BLOCKS_SINCE:
+                        int Index = (int) Recibir.readObject();
+                        ChainNode temp = LibraryManager.getBlockChain().getIndex(Index);
+                        int Loop = LibraryManager.getBlockChain().getNextIndex()-Index;
+                        Enviar.writeObject(Loop);
+                        while(temp!=null){
+                            Enviar.writeObject(temp.getData());
+                            temp = temp.getNext();
+                        }
                         break;
                     case Constantes.REQUEST_ADDNODE:
                         JSONObject NuevoBloque = (JSONObject) Recibir.readObject();

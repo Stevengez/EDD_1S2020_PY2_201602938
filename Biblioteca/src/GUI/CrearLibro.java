@@ -7,6 +7,10 @@ package GUI;
 
 import JSONCreator.Constantes;
 import Network.NetworkManager;
+import biblioteca.Categoria;
+import biblioteca.Estructuras.Clave;
+import biblioteca.Libro;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,18 +21,19 @@ public class CrearLibro extends javax.swing.JInternalFrame {
     /**
      * Creates new form CrearLibro
      */
+
     private CentralGUI Centralgui;
     private NetworkManager NetManager;
-    
+
     public CrearLibro(CentralGUI Centralgui) {
         this.Centralgui = Centralgui;
         this.NetManager = Centralgui.getLibraryManager().getNetworkManager();
         setName(Constantes.GUI_VENTANA_CREAR_USUARIO);
         initComponents();
         this.Carnet.setText(String.valueOf(NetManager.getLoggedUser().getCarnet()));
-        
+
     }
-    
+
     public CrearLibro(CentralGUI Centralgui, String Categoria) {
         this.Centralgui = Centralgui;
         this.NetManager = Centralgui.getLibraryManager().getNetworkManager();
@@ -192,7 +197,51 @@ public class CrearLibro extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void AgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AgregarActionPerformed
-        // TODO add your handling code here:
+
+        if (this.Centralgui.getLibraryManager().getNetworkManager().getLoggedUser() != null) {
+            String Mensaje = "";
+            if (this.Titulo.getText() == "" || this.Titulo.getText().matches("[\\s]+")) {
+                Mensaje = Mensaje = "Titulo vacio o invalido.\n";
+            }
+
+            if (this.Autor.getText() == "" || this.Autor.getText().matches("[\\s]+")) {
+                Mensaje = Mensaje = "Autor vacio o invalido.\n";
+            }
+
+            if (this.Editorial.getText() == "" || this.Editorial.getText().matches("[\\s]+")) {
+                Mensaje = Mensaje = "Editorial vacia o invalida.\n";
+            }
+
+            if (!this.Ano.getText().matches("[0-9]+")) {
+                Mensaje = Mensaje = "Año vacio o invalido.\n";
+            }
+
+            if (!this.Edicion.getText().matches("[0-9]+")) {
+                Mensaje = Mensaje = "Edicion vacia o invalida.\n";
+            }
+
+            if (this.Idioma.getText() == "" || this.Idioma.getText().matches("[\\s]+")) {
+                Mensaje = Mensaje = "Idioma vacio o invalido.\n";
+            }
+
+            if (Mensaje != "") {
+                JOptionPane.showMessageDialog(this, Mensaje);
+            } else {
+                Libro nuevo = new Libro(Integer.parseInt(this.ISBN.getText()),this.Titulo.getText(),this.Autor.getText(),this.Editorial.getText(),Integer.parseInt(this.Ano.getText()),Integer.parseInt(this.Edicion.getText()),this.Categoria.getText(),this.Idioma.getText(),Integer.parseInt(this.Carnet.getText()));
+                Clave conf = Centralgui.getLibraryManager().getLibreroGlobal().NewBook(nuevo, true);
+                
+                if(conf !=null){
+                    Categoria nueva = Centralgui.getLibraryManager().getLibrero().BuscarYCrear(this.Categoria.getText(), Integer.parseInt(this.Carnet.getText()),false).getData();
+                    nueva.getLibrero().NewBook(nuevo,false);
+                    JOptionPane.showMessageDialog(this, "Libro agregado a la biblioteca virtual");
+                    this.dispose();
+                }else{
+                    JOptionPane.showMessageDialog(this, "El ISBN debe ser unico, pero este ya existe.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Debes iniciar sesion.");
+        }
     }//GEN-LAST:event_AgregarActionPerformed
 
 

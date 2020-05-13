@@ -182,7 +182,7 @@ public class CentralGUI extends JFrame implements ActionListener {
         getJMenuBar().getMenu(2).getItem(4).setEnabled(true);
 
         getJMenuBar().getMenu(3).getItem(0).setEnabled(true);
-        
+
         getJMenuBar().getMenu(0).getItem(1).setEnabled(false);
         getJMenuBar().getMenu(1).getItem(0).setEnabled(false);
     }
@@ -305,23 +305,44 @@ public class CentralGUI extends JFrame implements ActionListener {
                 }
 
                 break;
+            case Constantes.MENU_OPCION_Bilioteca_MyVirtual:
+                JInternalFrame Mi_biblioteca_virtual = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+                if (Mi_biblioteca_virtual != null) {
+                    ActivateFrame(Mi_biblioteca_virtual);
+                } else {
+                    Mi_biblioteca_virtual = new BibliotecaVirtual(this, false);
+                    MultiWindowDesk.add(Mi_biblioteca_virtual);
+                    ActivateFrame(Mi_biblioteca_virtual);
+                }
+                break;
             case Constantes.MENU_OPCION_Bilioteca_Virtual:
                 JInternalFrame biblioteca_virtual = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
                 if (biblioteca_virtual != null) {
                     ActivateFrame(biblioteca_virtual);
                 } else {
-                    MultiWindowDesk.add(new BibliotecaVirtual(this, true));
+                    biblioteca_virtual =new BibliotecaVirtual(this, true); 
+                    MultiWindowDesk.add(biblioteca_virtual);
+                    ActivateFrame(biblioteca_virtual);
                 }
                 break;
             case Constantes.MENU_OPCION_Bilioteca_Opciones:
-                showWindow(MultiWindowDesk, Constantes.GUI_VENTANA_OPCIONES);
+                JInternalFrame settings = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_OPCIONES);
+                if (settings != null) {
+                    ActivateFrame(settings);
+                } else {
+                    settings =new Settings(this, this.LibraryManager.getNetworkManager()); 
+                    MultiWindowDesk.add(settings);
+                    ActivateFrame(settings);
+                }
                 break;
             case Constantes.MENU_OPCION_CargaMasiva_Libros:
                 JInternalFrame carga_libros = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_CARGA_LIBROS);
                 if (carga_libros != null) {
                     ActivateFrame(carga_libros);
                 } else {
-                    MultiWindowDesk.add(new CargaLibros(this));
+                    carga_libros = new CargaLibros(this);
+                    MultiWindowDesk.add(carga_libros);
+                    ActivateFrame(carga_libros);
                 }
                 break;
             case Constantes.MENU_OPCION_CargaMasiva_Usuarios:
@@ -329,7 +350,9 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (carga_usuario != null) {
                     ActivateFrame(carga_usuario);
                 } else {
-                    MultiWindowDesk.add(new CargaUsuarios(this));
+                    carga_usuario = new CargaUsuarios(this);
+                    MultiWindowDesk.add(carga_usuario);
+                    ActivateFrame(carga_usuario);
                 }
                 break;
             case Constantes.MENU_OPCION_Reportes_TablaHash:
@@ -337,7 +360,9 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (reporte_usuarios != null) {
                     ActivateFrame(reporte_usuarios);
                 } else {
-                    MultiWindowDesk.add(new ReporteTH(this));
+                    reporte_usuarios = new ReporteTH(this);
+                    MultiWindowDesk.add(reporte_usuarios);
+                    ActivateFrame(reporte_usuarios);
                 }
                 break;
             case Constantes.MENU_OPCION_Reportes_ArbolAVL:
@@ -345,7 +370,9 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (reporte_avl != null) {
                     ActivateFrame(reporte_avl);
                 } else {
-                    MultiWindowDesk.add(new ReporteAVL(this));
+                    reporte_avl = new ReporteAVL(this);
+                    MultiWindowDesk.add(reporte_avl);
+                    ActivateFrame(reporte_avl);
                 }
                 break;
             case Constantes.MENU_OPCION_Reportes_ArbolB:
@@ -353,7 +380,9 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (reporte_bi != null) {
                     ActivateFrame(reporte_bi);
                 } else {
-                    MultiWindowDesk.add(new ReporteLibros(this, LibraryManager.getLibreroGlobal()));
+                    reporte_bi = new ReporteLibros(this, LibraryManager.getLibreroGlobal());
+                    MultiWindowDesk.add(reporte_bi);
+                    ActivateFrame(reporte_bi);
                 }
                 break;
             case Constantes.MENU_OPCION_BLOCKCHAIN_SYNC:
@@ -361,7 +390,9 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (sync_block != null) {
                     ActivateFrame(sync_block);
                 } else {
-                    MultiWindowDesk.add(new BlockUpload(this));
+                    sync_block = new BlockUpload(this);
+                    MultiWindowDesk.add(sync_block);
+                    ActivateFrame(sync_block);
                 }
                 break;
         }

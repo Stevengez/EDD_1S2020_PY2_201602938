@@ -28,7 +28,7 @@ public class Constantes {
     public final static int RED_DEFAULT_BROADCAST_PORTCLIENT = 9530;
     public final static String RED_DEFAULT_BROADCAST_MASK = "192.168.0.255";
     
-    public final static int RED_DEFAULT_TIMEOUT = 1000;
+    public final static int RED_DEFAULT_TIMEOUT = 5000;
     
     /* BlockChain */
     public final static String JSON_BLOCKLIST_LABEL = "BLOQUES_LISTADO";
@@ -48,6 +48,9 @@ public class Constantes {
     public final static String REQUEST_ADDNODE_CONFIRMATION = "C:NODEADDED";
     public final static String REQUEST_ADDNODE_ERROR = "CE:ERRORCORRUPTED";
     
+    public final static String REQUEST_BLOCKS_SINCE = "R:BLOCKSINCE";
+    public final static String REQUEST_BLOCKS_SINCE_END = "CR:BLOCKSINCE";
+    
     /* JSON LABEL */
     
     public final static String JSON_DATA_LABEL = "DATA";
@@ -64,6 +67,7 @@ public class Constantes {
     
     public final static String JSON_BOOKS_ADD = "CREAR_LIBRO";
     public final static String JSON_BOOKS_DELETE = "ELIMINAR_LIBRO";
+    public final static String JSON_BOOKS_EDIT = "EDITAR_LIBRO";
     
     public final static String JSON_CATEGORY_ADD = "CREAR_CATEGORIA";
     public final static String JSON_CATEGORY_DELETE = "ELIMINAR_CATEGORIA";
@@ -118,6 +122,7 @@ public class Constantes {
     public final static String GUI_VENTANA_LOGIN = "LOG-IN";
     public final static String GUI_VENTANA_MYPROFILE = "PROFILE";
     public final static String GUI_VENTANA_BIBLIOTECAVIRTUAL = "BBVIRTUAL";
+    public final static String GUI_VENTANA_MI_BIBLIOTECAVIRTUAL = "MYBBVIRTUAL";
     
     public final static String GUI_VENTANA_CREAR_LIBRO = "CREARLIBRO";
     public final static String GUI_VENTANA_CREAR_USUARIO = "CREARUSUARIO";
@@ -132,8 +137,10 @@ public class Constantes {
     
     public final static String MENU_OPCION_Bilioteca_LogInOut = "LOGINOUT";
     public final static String MENU_OPCION_Bilioteca_MyVirtual = "MYVIRTUAL";
+    public final static String MENU_OPCION_Bilioteca_MyProfile = "MYPROFILE";
     public final static String MENU_OPCION_Bilioteca_Virtual = "VIRTUAL";
     public final static String MENU_OPCION_Bilioteca_Opciones = "CONFIG";
+    public final static String MENU_OPCION_Bilioteca_Create_NewBook = "NEWBOOK";
     public final static String MENU_OPCION_Bilioteca_salir = "SALIR";
     public final static String MENU_OPCION_CargaMasiva_Usuarios = "CLIBROS";
     public final static String MENU_OPCION_CargaMasiva_Libros = "CUSUARIOS";

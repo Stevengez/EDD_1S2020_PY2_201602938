@@ -193,7 +193,7 @@ public class NetworkManager {
         this.unicoNodo = true;
     }
 
-    public void setUniqueNodeFlase() {
+    public void setUniqueNodeFalse() {
         this.unicoNodo = false;
     }
     

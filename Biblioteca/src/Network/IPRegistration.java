@@ -6,18 +6,13 @@
 package Network;
 
 import JSONCreator.Constantes;
-import biblioteca.Biblioteca;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
@@ -69,6 +64,8 @@ public class IPRegistration {
             NetManager.setSyncHost(Confirm.getAddress().getHostAddress());
             NetManager.setSyncPort(Integer.parseInt(SyncPort));
             Client.close();
+            NetManager.createServer();
+            NetManager.getClient();
         } catch (SocketException ex) {
             Logger.getLogger(IPRegistration.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnknownHostException ex) {
@@ -113,8 +110,10 @@ public class IPRegistration {
             }
 
         } catch (SocketException ex) {
+            JOptionPane.showMessageDialog(null, "Error: "+ex.getMessage());
             Logger.getLogger(IPRegistration.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error: "+ex.getMessage());
             Logger.getLogger(IPRegistration.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -38,6 +38,80 @@ public class ArbolB {
             return temp;
         }
     }
+    
+    /* Buscar Libros */
+    
+    public Clave getBook(int ISBN) {
+        Clave temp = Buscar(this.Raiz, ISBN);
+        if (temp == null) {
+            return null;
+        } else {
+            return temp;
+        }
+    }
+    
+    private Clave Buscar(NodoB Padre, int ISBN) {
+        if (Padre.SubNiveles() == 0) {
+            /* Validamos si existe */
+            return existKey(Padre, ISBN);
+        } else {
+            switch (Padre.getKeySize()) {
+                case 1:
+                    if (existKey(Padre, ISBN) != null) {
+                        return existKey(Padre, ISBN);
+                    }
+
+                    if (ISBN > Padre.getKey1().getClave()) {
+                        return Buscar(Padre.getKey1().getMayores(), ISBN);
+                    } else {
+                        return Buscar(Padre.getKey1().getMenores(), ISBN);
+                    }
+                case 2:
+                    if (existKey(Padre, ISBN) != null) {
+                        return existKey(Padre, ISBN);
+                    }
+
+                    if (ISBN > Padre.getKey2().getClave()) {
+                        return Buscar(Padre.getKey2().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        return Buscar(Padre.getKey1().getMayores(), ISBN);
+                    } else {
+                        return Buscar(Padre.getKey1().getMenores(), ISBN);
+                    }
+                case 3:
+                    if (existKey(Padre, ISBN) != null) {
+                        return existKey(Padre, ISBN);
+                    }
+
+                    if (ISBN > Padre.getKey3().getClave()) {
+                        return Buscar(Padre.getKey3().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey2().getClave()) {
+                        return Buscar(Padre.getKey2().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        return Buscar(Padre.getKey1().getMayores(), ISBN);
+                    } else {
+                        return Buscar(Padre.getKey1().getMenores(), ISBN);
+                    }
+                case 4:
+                    if (existKey(Padre, ISBN) != null) {
+                        return existKey(Padre, ISBN);
+                    }
+
+                    if (ISBN > Padre.getKey4().getClave()) {
+                        return Buscar(Padre.getKey4().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey3().getClave()) {
+                        return Buscar(Padre.getKey3().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey2().getClave()) {
+                        return Buscar(Padre.getKey2().getMayores(), ISBN);
+                    } else if (ISBN > Padre.getKey1().getClave()) {
+                        return Buscar(Padre.getKey1().getMayores(), ISBN);
+                    } else {
+                        return Buscar(Padre.getKey1().getMenores(), ISBN);
+                    }
+            }
+            return null;
+        }
+    }
 
     public NodoB getRaiz() {
         return this.Raiz;
@@ -804,7 +878,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey1().getData();
                         Puntero++;
                     }
@@ -818,7 +892,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey1().getData();
                         Puntero++;
                     }
@@ -827,7 +901,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey2().getData();
                         Puntero++;
                     }
@@ -841,7 +915,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey1().getData();
                         Puntero++;
                     }
@@ -850,7 +924,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey2().getData();
                         Puntero++;
                     }
@@ -859,7 +933,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey3().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey3().getData();
                         Puntero++;
                     }
@@ -873,7 +947,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey1().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey1().getData();
                         Puntero++;
                     }
@@ -882,7 +956,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey2().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey2().getData();
                         Puntero++;
                     }
@@ -891,7 +965,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey3().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey3().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey3().getData();
                         Puntero++;
                     }
@@ -900,7 +974,7 @@ public class ArbolB {
                         ArrayEnOrder(Padre.getKey4().getMenores(), Filtro);
                     }
 
-                    if((Filtro.matches("[0-9]+") && Padre.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey4().getData().getTitle().contains(Filtro)){
+                    if((Filtro.matches("[0-9]+") && Padre.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Padre.getKey4().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                         BooksArray[Puntero] = Padre.getKey4().getData();
                         Puntero++;
                     }
@@ -1022,7 +1096,6 @@ public class ArbolB {
                     break;
             }
         }
-
     }
 
     public void Niveles(NodoB Izquierda, int Nivel) {
@@ -1103,49 +1176,49 @@ public class ArbolB {
     private void AddtoArray(NodoB Nodo, String Filtro) {
         switch (Nodo.getKeySize()) {
             case 1:
-                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey1().getData();
                     Puntero++;
                 }                
                 break;
             case 2:
-                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey1().getData();
                     Puntero++;
                 }                
-                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey2().getData();
                     Puntero++;
                 }
                 break;
             case 3:
-                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey1().getData();
                     Puntero++;
                 }                
-                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey2().getData();
                     Puntero++;
                 }
-                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey3().getData();
                     Puntero++;
                 }
                 break;
             case 4:
-                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey1().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey1().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey1().getData();
                     Puntero++;
                 }                
-                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey2().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey2().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey2().getData();
                     Puntero++;
                 }
-                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey3().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey3().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey3().getData();
                     Puntero++;
                 }
-                if((Filtro.matches("[0-9]+") && Nodo.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey4().getData().getTitle().contains(Filtro)){
+                if((Filtro.matches("[0-9]+") && Nodo.getKey4().getData().getISBN() == Integer.parseInt(Filtro)) || Nodo.getKey4().getData().getTitle().toUpperCase().contains(Filtro.toUpperCase())){
                     BooksArray[Puntero] = Nodo.getKey4().getData();
                     Puntero++;
                 }

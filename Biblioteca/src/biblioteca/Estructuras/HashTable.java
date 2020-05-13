@@ -48,10 +48,15 @@ public class HashTable {
     public void delUser(int Carnet, boolean LocalJSON){
         SubNodoHash eliminar = Casilleros[getLockerID(Carnet)].removeCarnet(Carnet);
         if(eliminar != null){
+            if(Casilleros[getLockerID(Carnet)].getSize()<1){
+                Casilleros[getLockerID(Carnet)] = null;
+            }
             if(!LocalJSON){
                 /* Agregar Operacion al Bloque */
                 JSONCreator.delUserOperation(JSONCreator.getCurrentBlock(), eliminar);
             }
+        }else{
+            System.out.println("No existia ese usuario");
         }
     }
     

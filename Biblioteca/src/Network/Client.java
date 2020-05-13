@@ -61,6 +61,18 @@ public class Client {
         return false;
     }
 
+    public void requestCloseSocket() {
+        try {
+            ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
+            System.out.println("Envie una solicitud de Cierre");
+            Enviar.writeObject(Constantes.REQUEST_CLOSESOCKET);
+            Client.close();
+            System.out.println("Termine la Conexion A Peticion");
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public String requestNetworkNodes() {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
@@ -86,7 +98,7 @@ public class Client {
             connectTo(peer.getIP(), peer.getServerPort(), Context);
             try {
                 ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-                System.out.println("Envie una solicitud de agregar nodo a: "+peer.getIP());
+                System.out.println("Envie una solicitud de agregar nodo a: " + peer.getIP());
                 Enviar.writeObject(Constantes.REQUEST_ADD_NETWORKNODE);
                 Enviar.writeObject(JSONCreator.addMeRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()));
                 requestCloseSocket();
@@ -98,14 +110,31 @@ public class Client {
         }
     }
 
-    public void requestCloseSocket() {
+    public void requestBlockSince(int Index, JInternalFrame Context) {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-            System.out.println("Envie una solicitud de Cierre");
-            Enviar.writeObject(Constantes.REQUEST_CLOSESOCKET);
-            Client.close();
-            System.out.println("Termine la Conexion A Peticion");
+            System.out.println("Envie una solicitud de Bloques desde " + Index);
+            Enviar.writeObject(Constantes.REQUEST_BLOCKS_SINCE);
+            Enviar.writeObject(Index);
+
+            ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
+            int loop = (int) Recibir.readObject();
+
+            for (int a = 0; a < loop; a++) {
+                JSONObject Bloque = (JSONObject) Recibir.readObject();
+                if (JSONCreator.validateBlock(Bloque, this.NetManager.getLibraryManager().getBlockChain())) {
+                    System.out.println("Valida el bloque y lo agregue a la lissta en memoria");
+                    this.NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, true, false, true);
+                } else {
+                    System.out.println("Bloque corrupto.");
+                }
+            }
+
+            requestCloseSocket();
+            JOptionPane.showMessageDialog(Context, "Recibi todos los bloques");
         } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
