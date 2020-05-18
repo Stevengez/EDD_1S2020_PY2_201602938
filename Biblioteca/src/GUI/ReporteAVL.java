@@ -7,8 +7,11 @@ package GUI;
 
 import JSONCreator.Constantes;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
@@ -22,12 +25,19 @@ public class ReporteAVL extends javax.swing.JInternalFrame {
      * Creates new form ReporteAVL
      */
     private CentralGUI Centralgui;
+
     public ReporteAVL(CentralGUI Centralgui) {
         this.Centralgui = Centralgui;
         setName(Constantes.GUI_VENTANA_REPORTE_AVL);
         initComponents();
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirCategorias(0);
-        if(!ruta.equals("")) ReporteContainer.setIcon(new ImageIcon(ruta));
+        if (!ruta.equals("")) {
+            try {
+                ReporteContainer.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+            } catch (IOException ex) {
+                Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -170,31 +180,47 @@ public class ReporteAVL extends javax.swing.JInternalFrame {
 
     private void PreorderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PreorderActionPerformed
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirCategorias(1);
-        ReporteContainer.setIcon(new ImageIcon(ruta));
+        try {
+            ReporteContainer.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_PreorderActionPerformed
 
     private void EnorderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnorderActionPerformed
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirCategorias(2);
-        ReporteContainer.setIcon(new ImageIcon(ruta));
+        try {
+            ReporteContainer.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_EnorderActionPerformed
 
     private void PostorderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PostorderActionPerformed
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirCategorias(3);
-        ReporteContainer.setIcon(new ImageIcon(ruta));
+        try {
+            ReporteContainer.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_PostorderActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirCategorias(0);
-        ReporteContainer.setIcon(new ImageIcon(ruta));
+        try {
+            ReporteContainer.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         JInternalFrame listado = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_REPORTE_BI_LISTA);
-        if(listado == null){
+        if (listado == null) {
             listado = new ListaCategorias(Centralgui);
             Centralgui.getDesktop().add(listado);
             Centralgui.getDesktop().getDesktopManager().activateFrame(listado);
-        }else{
+        } else {
             try {
                 listado.setIcon(false);
                 listado.show();

@@ -28,7 +28,8 @@ public class Constantes {
     public final static int RED_DEFAULT_BROADCAST_PORTCLIENT = 9530;
     public final static String RED_DEFAULT_BROADCAST_MASK = "192.168.0.255";
     
-    public final static int RED_DEFAULT_TIMEOUT = 5000;
+    public final static int RED_DEFAULT_TIMEOUT = 15000;
+    public final static int RED_BROADCAST_DEFAULT_TIMEOUT = 2000;
     
     /* BlockChain */
     public final static String JSON_BLOCKLIST_LABEL = "BLOQUES_LISTADO";
@@ -43,10 +44,13 @@ public class Constantes {
     
     public final static String REQUEST_NETWORKNODES = "R:NETWORKNODES";
     public final static String REQUEST_ADD_NETWORKNODE = "R:ADDNETWORKNODE";
+    public final static String REQUEST_ADD_NETWORKNODE_C = "C:ADDNETWORKNODE";
+    public final static String REQUEST_DEL_NETWORKNODE = "R:DELNETWORKNODE";
+    public final static String REQUEST_DEL_NETWORKNODE_C = "C:DELNETWORKNODE";
     public final static String REQUEST_CLOSESOCKET = "R:CLOSESOCKET";
-    public final static String REQUEST_ADDNODE = "R:ADDNODE";
-    public final static String REQUEST_ADDNODE_CONFIRMATION = "C:NODEADDED";
-    public final static String REQUEST_ADDNODE_ERROR = "CE:ERRORCORRUPTED";
+    public final static String REQUEST_ADDBLOCK = "R:ADDNODE";
+    public final static String REQUEST_ADDBLOCK_CONFIRMATION = "C:NODEADDED";
+    public final static String REQUEST_ADDBLOCK_ERROR = "CE:ERRORCORRUPTED";
     
     public final static String REQUEST_BLOCKS_SINCE = "R:BLOCKSINCE";
     public final static String REQUEST_BLOCKS_SINCE_END = "CR:BLOCKSINCE";
@@ -54,6 +58,7 @@ public class Constantes {
     /* JSON LABEL */
     
     public final static String JSON_DATA_LABEL = "DATA";
+    public final static String JSON_RED_LABEL = "RED";
     public final static String JSON_INDEX = "INDEX";
     public final static String JSON_TIMESTAMP = "TIMESTAMP";
     public final static String JSON_NONCE = "NONCE";
@@ -117,7 +122,6 @@ public class Constantes {
     public final static String GUI_VENTANA_OPCIONES = "CONFIGURACION";
     public final static String GUI_VENTANA_CARGA_USUARIOS = "CARGAUSUARIOS";
     public final static String GUI_VENTANA_CARGA_LIBROS = "CARGALIBROS";
-    public final static String GUI_VENTANA_MI_CUENTA = "MIPERFIL";
     public final static String GUI_VENTANA_SYNCBLOCK = "SINCRONIZADOR";
     public final static String GUI_VENTANA_LOGIN = "LOG-IN";
     public final static String GUI_VENTANA_MYPROFILE = "PROFILE";
@@ -126,12 +130,15 @@ public class Constantes {
     
     public final static String GUI_VENTANA_CREAR_LIBRO = "CREARLIBRO";
     public final static String GUI_VENTANA_CREAR_USUARIO = "CREARUSUARIO";
+    public final static String GUI_VENTANA_CREAR_CATEGORIA = "CREARCATEGORIA";
     
     public final static String GUI_VENTANA_REPORTE_USUARIOS = "REPORTEUSUARIOS";
     public final static String GUI_VENTANA_REPORTE_AVL = "REPORTEAVL";
     public final static String GUI_VENTANA_REPORTE_BINDIVIDUAL = "REPORTEBI";
     public final static String GUI_VENTANA_REPORTE_BI_LISTA = "REPORTEBILISTA";
     public final static String GUI_VENTANA_REPORTE_BGENERAL = "REPORTEBG";
+    public final static String GUI_VENTANA_REPORTE_NODOSRED = "REPORTENR";
+    public final static String GUI_VENTANA_REPORTE_BlockChain = "REPORTEBLC";
     
     /* Constantes del Menu */
     
@@ -141,13 +148,15 @@ public class Constantes {
     public final static String MENU_OPCION_Bilioteca_Virtual = "VIRTUAL";
     public final static String MENU_OPCION_Bilioteca_Opciones = "CONFIG";
     public final static String MENU_OPCION_Bilioteca_Create_NewBook = "NEWBOOK";
+    public final static String MENU_OPCION_Bilioteca_CreateUser = "NEWUSER";
+    public final static String MENU_OPCION_Bilioteca_CreateCat = "NEWCAT";
     public final static String MENU_OPCION_Bilioteca_salir = "SALIR";
     public final static String MENU_OPCION_CargaMasiva_Usuarios = "CLIBROS";
     public final static String MENU_OPCION_CargaMasiva_Libros = "CUSUARIOS";
     public final static String MENU_OPCION_Reportes_ArbolAVL = "RAVL";
     public final static String MENU_OPCION_Reportes_ArbolB = "RB";
     public final static String MENU_OPCION_Reportes_TablaHash = "RT";
-    public final static String MENU_OPCION_Reportes_BlockCHain = "RB";
+    public final static String MENU_OPCION_Reportes_BlockCHain = "RBLC";
     public final static String MENU_OPCION_Reportes_NetworkList = "RR";
     public final static String MENU_OPCION_BLOCKCHAIN_SYNC = "BCS";
     

@@ -7,9 +7,6 @@ package GUI;
 
 import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
-import java.beans.PropertyVetoException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -30,9 +27,18 @@ public class BlockUpload extends javax.swing.JInternalFrame {
         setName(Constantes.GUI_VENTANA_SYNCBLOCK);
         moveToFront();
         initComponents();
+        if(JSONCreator.isPrepared){
+            this.SyncButton.setText("Sincronizar");
+        }else{
+            this.SyncButton.setText("Preparar");
+        }
         SyncProgress.setMinimum(1);
         SyncProgress.setMaximum(5);
         getCurrentBlockValues();
+    }
+    
+    public void changeActionLabel(boolean isPrepared){
+        
     }
 
     /**
@@ -187,26 +193,41 @@ public class BlockUpload extends javax.swing.JInternalFrame {
 
     private void SyncButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SyncButtonActionPerformed
         JSONObject Bloque = JSONCreator.getCurrentBlock();
-        if(SyncButton.getText().equals("Preparar")){
+        if(!JSONCreator.isPrepared){
             SyncProgress.setValue(2);
-            JSONCreator.prepareBlock(Centralgui.getLibraryManager().getBlockChain().getNextIndex(),Centralgui.getLibraryManager().getBlockChain().getLastHash());
-            SyncProgress.setValue(4);
-            CurrentBlockIndex.setText(Bloque.get(Constantes.JSON_INDEX).toString());
-            CurrentBlockTS.setText(Bloque.get(Constantes.JSON_TIMESTAMP).toString());
-            CurrentBlockNN.setText(Bloque.get(Constantes.JSON_NONCE).toString());
             int operaciones = ((JSONArray)Bloque.get(Constantes.JSON_DATA_LABEL)).size();
-            CurrentBlockOPN.setText(operaciones+"");
-            CurrentBlockHS.setText(Bloque.get(Constantes.JSON_HASH).toString());
-            SyncProgress.setValue(5);
             if(operaciones >0){
+                JSONCreator.prepareBlock(Centralgui.getLibraryManager().getBlockChain().getNextIndex(),Centralgui.getLibraryManager().getBlockChain().getLastHash());
+                SyncProgress.setValue(4);
+                CurrentBlockIndex.setText(Bloque.get(Constantes.JSON_INDEX).toString());
+                CurrentBlockTS.setText(Bloque.get(Constantes.JSON_TIMESTAMP).toString());
+                CurrentBlockNN.setText(Bloque.get(Constantes.JSON_NONCE).toString());
+
+                CurrentBlockOPN.setText(operaciones+"");
+                CurrentBlockHS.setText(Bloque.get(Constantes.JSON_HASH).toString());
+                SyncProgress.setValue(5);
                 SyncButton.setText("Sincronizar");
             }else{
                 JOptionPane.showMessageDialog(this, "No hay operaciones en el nuevo bloque, agregar, elimina o edita algo.");
+                SyncProgress.setValue(0);
+                CurrentBlockIndex.setText("0");
+                CurrentBlockTS.setText("---");
+                CurrentBlockNN.setText("---");
+                CurrentBlockOPN.setText("---");
+                CurrentBlockHS.setText("---");
+                SyncButton.setText("Preparar");
             }
-            SyncProgress.setValue(0);
         }else{
+            SyncProgress.setValue(0);
             Centralgui.getLibraryManager().getNetworkManager().getClient().requestAddBlock(Bloque, this);
+            SyncProgress.setValue(5);
+            CurrentBlockIndex.setText("0");
+            CurrentBlockTS.setText("---");
+            CurrentBlockNN.setText("---");
+            CurrentBlockOPN.setText("---");
+            CurrentBlockHS.setText("---");
             SyncButton.setText("Preparar");
+            Centralgui.updateLibraryPostBlockSync();
         }
     }//GEN-LAST:event_SyncButtonActionPerformed
 

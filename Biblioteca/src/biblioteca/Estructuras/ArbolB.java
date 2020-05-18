@@ -118,17 +118,18 @@ public class ArbolB {
     }
 
     public void RemoveBook(int ISBN, boolean LocalJSON) {
-        System.out.println("#######Eliminar: " + ISBN);
+        //System.out.println("#######Eliminar: " + ISBN);
         Clave temp = Eliminar(this.Raiz, ISBN);
         if (temp == null) {
-            System.out.println("No existe");
+            //System.out.println("No existe");
         } else {
             this.Size--;
+            temp.getData().setDeletedStatus(true);
             if (!LocalJSON) {
                 /* Agregar Operacion al Bloque */
                 JSONCreator.delBookOperation(JSONCreator.getCurrentBlock(), temp.getData());
             }
-            System.out.println("Eliminado");
+            //System.out.println("Eliminado");
         }
     }
 
@@ -144,18 +145,14 @@ public class ArbolB {
             return temp;
         } else {
             /* Reemplazar y Conectar */
-            System.out.println("Los Menores de " + Arriba.getClave() + " son: ");
-            ImprimirClaves(Arriba.getMenores());
-            System.out.println("Estoy reemplazando a: " + Arriba.getClave() + " con el mayor de menores: " + Padre.maxClave().getClave());
 
             Padre.maxClave().setMayores(Arriba.getMayores());
             Padre.maxClave().setMenores(Arriba.getMenores());
             Arriba.convertTo(Padre.maxClave());
 
             /* Eliminar */
-            //System.out.println("Voy a borrar la clave intercambiada");
+            
             Padre.deleteKey(Padre.maxClave());
-            //System.out.println("Aqui Comienza el balanceo del Nodo que contiene a  14");
             Balancear(Padre);
             return Padre;
         }
@@ -165,7 +162,7 @@ public class ArbolB {
         if (Padre.SubNiveles() == 0) {
             /* Validamos si existe */
             if (existKey(Padre, Data.getISBN()) != null) {
-                System.out.println("Esta clave ya existe.");
+                //System.out.println("Esta clave ya existe.");
                 return null;
             }
 
@@ -180,7 +177,7 @@ public class ArbolB {
             switch (Padre.getKeySize()) {
                 case 1:
                     if (existKey(Padre, Data.getISBN()) != null) {
-                        System.out.println("Esta clave ya existe.");
+                        //System.out.println("Esta clave ya existe.");
                         return null;
                     }
 
@@ -197,7 +194,7 @@ public class ArbolB {
                     }
                 case 2:
                     if (existKey(Padre, Data.getISBN()) != null) {
-                        System.out.println("Esta clave ya existe.");
+                        //System.out.println("Esta clave ya existe.");
                         return null;
                     }
 
@@ -219,7 +216,7 @@ public class ArbolB {
                     }
                 case 3:
                     if (existKey(Padre, Data.getISBN()) != null) {
-                        System.out.println("Esta clave ya existe.");
+                        //System.out.println("Esta clave ya existe.");
                         return null;
                     }
 
@@ -246,7 +243,7 @@ public class ArbolB {
                     }
                 case 4:
                     if (existKey(Padre, Data.getISBN()) != null) {
-                        System.out.println("Esta clave ya existe.");
+                        //System.out.println("Esta clave ya existe.");
                         return null;
                     }
                     if (Data.getISBN() > Padre.getKey4().getClave()) {
@@ -425,21 +422,21 @@ public class ArbolB {
     /* Metodos de Balanceo */
     public void Balancear(NodoB Nodo) {
         if (Nodo.getKeySize() == 5) {
-            System.out.println("Requiere Balanceo (Caso de Division)");
+            //System.out.println("Requiere Balanceo (Caso de Division)");
             DivideNode(Nodo);
         } else if (Nodo.getKeySize() < 2 && Nodo != this.Raiz) {
             if (Nodo.getYB() != null && Nodo.getYB().getKeySize() > 2 && Nodo.getYB().getPadre() == Nodo.getPadre()) {
-                System.out.println("Requiere Balanceo (Prestamo Izquierdo)");
+                //System.out.println("Requiere Balanceo (Prestamo Izquierdo)");
                 PrestamoIzquierdo(Nodo.getYB(), Nodo);
             } else if (Nodo.getBB() != null && Nodo.getBB().getKeySize() > 2 && Nodo.getBB().getPadre() == Nodo.getPadre()) {
-                System.out.println("Requiere Balanceo (Prestamo Derecho)");
+                //System.out.println("Requiere Balanceo (Prestamo Derecho)");
                 PrestamoDerecho(Nodo, Nodo.getBB());
             } else {
-                System.out.println("Requiere Balanceo (Union de Nodos)");
+                //System.out.println("Requiere Balanceo (Union de Nodos)");
                 MergeNodo(Nodo);
             }
         } else {
-            System.out.println("No requiere balanceo");
+            //System.out.println("No requiere balanceo");
         }
     }
 
@@ -451,17 +448,17 @@ public class ArbolB {
         Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Deficiente, Derecho);
         Clave NuevaCentral = Derecho.minClave();
         if (ClaveCentral == null) {
-            System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
+            //System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
         }
-        System.out.println("Clave Superior es: " + ClaveCentral.getClave());
-        System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
+        //System.out.println("Clave Superior es: " + ClaveCentral.getClave());
+        //System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
 
         if (NuevaCentral.getMenores() != null) {
             noHoja = true;
             menoresNuevaCentral = NuevaCentral.getMenores();
         } else {
-            System.out.println("Estoy en una hoja.");
-            System.out.println("La clave minima del deficientes es: " + Deficiente.minClave().getClave());
+            //System.out.println("Estoy en una hoja.");
+            //System.out.println("La clave minima del deficientes es: " + Deficiente.minClave().getClave());
         }
 
         /* Reconectar Central */
@@ -495,10 +492,10 @@ public class ArbolB {
         Clave ClaveCentral = Deficiente.getPadre().getMiddleKey(Izquierdo, Deficiente);
         Clave NuevaCentral = Izquierdo.maxClave();
         if (ClaveCentral == null) {
-            System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
+            //System.out.println("Tienen el Mismo padre pero las claves no tienen estos mayores/menores");
         }
-        System.out.println("Clave Superior es: " + ClaveCentral.getClave());
-        System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
+        //System.out.println("Clave Superior es: " + ClaveCentral.getClave());
+        //System.out.println("Clave Reemplazo es: " + NuevaCentral.getClave());
 
         if (NuevaCentral.getMayores() != null) {
             noHoja = true;
@@ -538,9 +535,9 @@ public class ArbolB {
 
         //System.out.println("Estoy Trabajando en el Nodo " + Nodo.minKey() + "-" + Nodo.maxKey());
         //if (Nodo.getPadre() != null) {
-        //  System.out.println("Su Padre es: " + Nodo.getPadre().minKey() + "-" + Nodo.getPadre().maxKey());
+        //  //System.out.println("Su Padre es: " + Nodo.getPadre().minKey() + "-" + Nodo.getPadre().maxKey());
         //} else {
-        //  System.out.println("No tiene Padre.");
+        //  //System.out.println("No tiene Padre.");
         //}
         if (Nodo.getPadre() != null) {
             Nodo.getKey3().setMenores(Nodo);
@@ -602,7 +599,7 @@ public class ArbolB {
             Nodo.addSubLevel();
             this.Raiz = Nodo;
         }
-        System.out.println("Termine el Balanceo.");
+        //System.out.println("Termine el Balanceo.");
     }
 
     public void MergeNodo(NodoB Nodo) {
@@ -626,9 +623,6 @@ public class ArbolB {
             Izquierda = Nodo;
             Derecha = Nodo.getBB();
         }
-
-        System.out.println("La clave necesaria es: " + ClaveCentral.getClave());
-        ImprimirClaves(Padre);
 
         /* Bajar la Clave Central */
         if (Derecha.SubNiveles() > 0) {
@@ -723,17 +717,17 @@ public class ArbolB {
                 Padre.setBB(null);
             }
         }
-        System.out.println("Termine el Balanceo.");
+        //System.out.println("Termine el Balanceo.");
     }
 
     public void Imprimir() {
-        System.out.println("******Imprimiendo Arbol**********");
+        //System.out.println("******Imprimiendo Arbol**********");
         EnOrder(this.Raiz);
     }
 
     public void ImprimirNiveles() {
         if (this.Raiz == null) {
-            System.out.println("El Arbol esta vacio.");
+            //System.out.println("El Arbol esta vacio.");
         } else {
             Niveles(this.Raiz, 0);
         }
@@ -746,7 +740,7 @@ public class ArbolB {
 
         Libro[] retorno = BooksArray;
         BooksArray = null;
-        System.out.println("Voy a devolver un array con: " + Puntero + " libros");
+        //System.out.println("Voy a devolver un array con: " + Puntero + " libros");
         return retorno;
     }
     
@@ -761,7 +755,7 @@ public class ArbolB {
         }
         
         BooksArray = null;
-        System.out.println("Voy a devolver un array con: " + Puntero + " libros");
+        //System.out.println("Voy a devolver un array con: " + Puntero + " libros");
         return retorno;
     }
 
@@ -861,7 +855,7 @@ public class ArbolB {
                     }
                     break;
                 default:
-                    System.out.println("Sin programar aun este caso.");
+                    //System.out.println("Sin programar aun este caso.");
                     break;
             }
         }
@@ -984,7 +978,7 @@ public class ArbolB {
                     }
                     break;
                 default:
-                    System.out.println("Sin programar aun este caso.");
+                    //System.out.println("Sin programar aun este caso.");
                     break;
             }
         }
@@ -994,9 +988,9 @@ public class ArbolB {
     public void EnOrder(NodoB Padre) {
         if (Padre.SubNiveles() == 0) {
             //if(Padre.getPadre()==null){
-            //    System.out.println("Se supone que estoy imprimiendo la raiz.");
+            //    //System.out.println("Se supone que estoy imprimiendo la raiz.");
             //}else{
-            //    System.out.println("Estoy en el Nodo con clave 1: "+Padre.getKey1().getClave()+" y padre con clave1: "+Padre.getPadre().getKey1().getClave());
+            //    //System.out.println("Estoy en el Nodo con clave 1: "+Padre.getKey1().getClave()+" y padre con clave1: "+Padre.getPadre().getKey1().getClave());
             //}
             ImprimirClaves(Padre);
         } else {
@@ -1009,7 +1003,7 @@ public class ArbolB {
                         EnOrder(Padre.getKey1().getMenores());
                     }
 
-                    System.out.println(Padre.getKey1().getClave() + "*");
+                    //System.out.println(Padre.getKey1().getClave() + "*");
 
                     if (Padre.getKey1().getMayores() != null) {
                         EnOrder(Padre.getKey1().getMayores());
@@ -1024,13 +1018,13 @@ public class ArbolB {
                         EnOrder(Padre.getKey1().getMenores());
                     }
 
-                    System.out.println(Padre.getKey1().getClave() + "*");
+                    //System.out.println(Padre.getKey1().getClave() + "*");
 
                     if (Padre.getKey2().getMenores() != null) {
                         EnOrder(Padre.getKey2().getMenores());
                     }
 
-                    System.out.println(Padre.getKey2().getClave() + "*");
+                    //System.out.println(Padre.getKey2().getClave() + "*");
 
                     if (Padre.getKey2().getMayores() != null) {
                         EnOrder(Padre.getKey2().getMayores());
@@ -1044,19 +1038,19 @@ public class ArbolB {
                         EnOrder(Padre.getKey1().getMenores());
                     }
 
-                    System.out.println(Padre.getKey1().getClave() + "*");
+                    //System.out.println(Padre.getKey1().getClave() + "*");
 
                     if (Padre.getKey2().getMenores() != null) {
                         EnOrder(Padre.getKey2().getMenores());
                     }
 
-                    System.out.println(Padre.getKey2().getClave() + "*");
+                    //System.out.println(Padre.getKey2().getClave() + "*");
 
                     if (Padre.getKey3().getMenores() != null) {
                         EnOrder(Padre.getKey3().getMenores());
                     }
 
-                    System.out.println(Padre.getKey3().getClave() + "*");
+                    //System.out.println(Padre.getKey3().getClave() + "*");
 
                     if (Padre.getKey3().getMayores() != null) {
                         EnOrder(Padre.getKey3().getMayores());
@@ -1067,32 +1061,32 @@ public class ArbolB {
                         EnOrder(Padre.getKey1().getMenores());
                     }
 
-                    System.out.println(Padre.getKey1().getClave() + "*");
+                    //System.out.println(Padre.getKey1().getClave() + "*");
 
                     if (Padre.getKey2().getMenores() != null) {
                         EnOrder(Padre.getKey2().getMenores());
                     }
 
-                    System.out.println(Padre.getKey2().getClave() + "*");
+                    //System.out.println(Padre.getKey2().getClave() + "*");
 
                     if (Padre.getKey3().getMenores() != null) {
                         EnOrder(Padre.getKey3().getMenores());
                     }
 
-                    System.out.println(Padre.getKey3().getClave() + "*");
+                    //System.out.println(Padre.getKey3().getClave() + "*");
 
                     if (Padre.getKey4().getMenores() != null) {
                         EnOrder(Padre.getKey4().getMenores());
                     }
 
-                    System.out.println(Padre.getKey4().getClave() + "*");
+                    //System.out.println(Padre.getKey4().getClave() + "*");
 
                     if (Padre.getKey4().getMayores() != null) {
                         EnOrder(Padre.getKey4().getMayores());
                     }
                     break;
                 default:
-                    System.out.println("Sin programar aun este caso.");
+                    //System.out.println("Sin programar aun este caso.");
                     break;
             }
         }
@@ -1101,18 +1095,18 @@ public class ArbolB {
     public void Niveles(NodoB Izquierda, int Nivel) {
         /*Hermanos Izquierdos*/
         NodoB temp = Izquierda;
-        System.out.println("------- Nivel : " + Nivel + " ---------");
+        //System.out.println("------- Nivel : " + Nivel + " ---------");
         String nivel = "";
         while (temp != null) {
             nivel = nivel + StringClaves(temp) + " > ";
             temp = temp.getBB();
         }
         System.out.println(nivel);
-        System.out.println("----------------- -----------");
+        //System.out.println("----------------- -----------");
         if (Izquierda.getKey1() != null && Izquierda.getKey1().getMenores() != null) {
             Niveles(Izquierda.getKey1().getMenores(), Nivel + 1);
         } else {
-            System.out.println("Estoy en el nivel " + Nivel + " y ya no hay mas niveles.");
+            //System.out.println("Estoy en el nivel " + Nivel + " y ya no hay mas niveles.");
         }
 
     }

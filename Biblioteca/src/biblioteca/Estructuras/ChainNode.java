@@ -5,6 +5,7 @@
  */
 package biblioteca.Estructuras;
 
+import JSONCreator.Constantes;
 import org.json.simple.JSONObject;
 
 /**
@@ -13,24 +14,34 @@ import org.json.simple.JSONObject;
  */
 public class ChainNode {
     private ChainNode Next, Prev;
-    private String prevSha, CurrentSha;
     private int NONCE, Index;
     private JSONObject Data;
     
-    public ChainNode(JSONObject Bloque, String Hash, int Index){
+    public ChainNode(JSONObject Bloque, int Index){
         this.Data = Bloque;
         this.Index = Index;
         this.Next = null;
         this.Prev = null;
-        this.CurrentSha = Hash;
     }
-    
-    public String getHASH(){
-        return this.CurrentSha;
-    }
-    
+        
     public int getIndex(){
         return this.Index;
+    }
+    
+    public String getTimeStamp(){
+        return Data.get(Constantes.JSON_TIMESTAMP).toString();
+    }
+    
+    public String getNONCE(){
+        return Data.get(Constantes.JSON_NONCE).toString();
+    }
+    
+    public String getPrevHash(){
+        return Data.get(Constantes.JSON_PREVIOUSHASH).toString();
+    }
+    
+    public String getHash(){
+        return Data.get(Constantes.JSON_HASH).toString();
     }
     
     public JSONObject getData(){

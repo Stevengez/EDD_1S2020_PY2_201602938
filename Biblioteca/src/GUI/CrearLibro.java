@@ -231,9 +231,10 @@ public class CrearLibro extends javax.swing.JInternalFrame {
                 Clave conf = Centralgui.getLibraryManager().getLibreroGlobal().NewBook(nuevo, true);
                 
                 if(conf !=null){
-                    Categoria nueva = Centralgui.getLibraryManager().getLibrero().BuscarYCrear(this.Categoria.getText(), Integer.parseInt(this.Carnet.getText()),false).getData();
+                    Categoria nueva = Centralgui.getLibraryManager().getLibrero().BuscarYCrear(this.Categoria.getText(), Integer.parseInt(this.Carnet.getText()),false);
                     nueva.getLibrero().NewBook(nuevo,false);
                     JOptionPane.showMessageDialog(this, "Libro agregado a la biblioteca virtual");
+                    Centralgui.getLibraryManager().getBlockChain().setPendingChange(true);
                     this.dispose();
                 }else{
                     JOptionPane.showMessageDialog(this, "El ISBN debe ser unico, pero este ya existe.");

@@ -30,11 +30,8 @@ public class Server extends Thread{
         try {
             System.out.println("Servidor:: Iniciando el servidor en el puerto: "+NetManager.getServerPort());
             ServerSocket Servidor = new ServerSocket(NetManager.getServerPort());
-            System.out.println("Servidor:: UP and Running on "+Servidor.getInetAddress().getHostAddress());
             while(NetManager.getServerStatus()){
-                System.out.println("Servidor:: Esperando una Conexion...");
-                new ServerThread(LibraryManager, Servidor.accept()).start();        
-                System.out.println("Servidor:: Cliente encontrado");
+                new ServerThread(LibraryManager, Servidor.accept()).start();
             }
             Servidor.close();
         } catch (IOException ex) {

@@ -11,9 +11,11 @@ package biblioteca;
  */
 public class Libro {
     private int ISBN, Year, Edition, ID_Author;
+    private volatile boolean isDeleted;
     private String Title, Name_Author, Printer, Category, Language; 
     public Libro(int ISBN, String Title, String Name_Author, String Printer, int Year, int Edition, String Category, String Language, int ID_Author){
         this.ISBN = ISBN;
+        this.isDeleted = false;
         this.Title = Title;
         this.Name_Author = Name_Author;
         this.Printer = Printer;
@@ -26,6 +28,14 @@ public class Libro {
     
     public int getISBN(){
         return this.ISBN;
+    }
+    
+    public boolean isDeleted(){
+        return this.isDeleted;
+    }
+    
+    public void setDeletedStatus(boolean nuevoEstado){
+        this.isDeleted = nuevoEstado;
     }
     
     public String getTitle(){

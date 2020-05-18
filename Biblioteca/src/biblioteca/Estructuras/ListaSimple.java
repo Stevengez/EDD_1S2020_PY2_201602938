@@ -32,9 +32,6 @@ public class ListaSimple {
                 Final.setSiguiente(nuevo);
                 nuevo.setAnterior(Final);
                 Final = nuevo;
-                System.out.println("Sincronice un Nodo: "+IP+":"+ServerPort);
-            } else {
-                System.out.println("Ya existe este nodo de red.");
             }
         }
     }
@@ -88,9 +85,6 @@ public class ListaSimple {
                 aux.getSiguiente().setAnterior(aux.getAnterior());
                 this.size--;
             }
-        }else{
-            System.out.println("No existia ese nodo, no se elimino nada");
-            
         }
     }
     

@@ -7,7 +7,6 @@ package biblioteca.Estructuras;
 
 import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
-import biblioteca.Biblioteca;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -27,10 +26,10 @@ public class HashTable {
         Casilleros = new NodoHash[Constantes.HASH_TABLE_MAXSIZE];    
     }
     
-    public SubNodoHash newUser(int Carnet, String Nombre, String Apellido, String Carrera, String Password, boolean LocalJSON){
+    public SubNodoHash newUser(int Carnet, String Nombre, String Apellido, String Carrera, String Password, boolean LocalJSON, boolean FromPeer ){
         if (Casilleros[getLockerID(Carnet)] == null) Casilleros[getLockerID(Carnet)] = new NodoHash(this);
         SubNodoHash nuevo;
-        if(LocalJSON){
+        if(LocalJSON || FromPeer){
             nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, Password);
         }else{
             nuevo = Casilleros[getLockerID(Carnet)].addCarnet(Carnet, Nombre, Apellido, Carrera, getMD5From(Password));
@@ -55,8 +54,6 @@ public class HashTable {
                 /* Agregar Operacion al Bloque */
                 JSONCreator.delUserOperation(JSONCreator.getCurrentBlock(), eliminar);
             }
-        }else{
-            System.out.println("No existia ese usuario");
         }
     }
     
@@ -95,12 +92,11 @@ public class HashTable {
     
     public SubNodoHash logIn(int Carnet, String Password){
         SubNodoHash Usuario = getUser(Carnet);
-        if(Usuario == null){ System.out.println("No Existe"); return null; }
+        if(Usuario == null){ System.out.println("Usuarios:: No Existe"); return null; }
         
         if(getMD5From(Password).equals(Usuario.getPassword())){
             return Usuario;
         }else{
-            System.out.println("Pass Real: "+Usuario.getPassword()+" Recibida: "+getMD5From(Password));
             return null;
         }
     }

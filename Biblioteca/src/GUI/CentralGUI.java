@@ -32,7 +32,6 @@ public class CentralGUI extends JFrame implements ActionListener {
     private DesktopManager_Modificado MultiWindowDeskManager;
     private volatile boolean LoggedIn, BootUp;
 
-
     /* Data Source */
     private Biblioteca LibraryManager;
 
@@ -47,8 +46,8 @@ public class CentralGUI extends JFrame implements ActionListener {
         super.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                LibraryManager.getNetworkManager().getClient().requestDelNetworkNode();
                 LibraryManager.getBlockChain().generateBlockListFile();
-                System.out.println("Cerrado desde la GUI");
                 System.exit(0);
             }
         });
@@ -59,8 +58,6 @@ public class CentralGUI extends JFrame implements ActionListener {
         getContentPane().add(MultiWindowDesk);
 
         MultiWindowDesk.add(new Settings(this, LibraryManager.getNetworkManager()));
-
-        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
         this.LibraryManager = LibraryManager;
@@ -169,7 +166,6 @@ public class CentralGUI extends JFrame implements ActionListener {
     }
 
     public void enableLoggedOut() {
-        System.out.println("La cantidad de menus son: " + getJMenuBar().getMenuCount());
         getJMenuBar().getMenu(0).getItem(0).setEnabled(true);
         getJMenuBar().getMenu(0).getItem(2).setEnabled(true);
 
@@ -255,6 +251,28 @@ public class CentralGUI extends JFrame implements ActionListener {
         }
     }
 
+    public JInternalFrame getWindow(String windowName) {
+        JInternalFrame[] ventanas = MultiWindowDesk.getAllFrames();
+        for (JInternalFrame ventana : ventanas) {
+            if (ventana.getName().equals(windowName)) {
+                return ventana;
+            }
+        }
+        return null;
+    }
+
+    public void updateLibraryPostBlockSync() {
+        JInternalFrame mibiblioteca = getWindow(Constantes.GUI_VENTANA_MI_BIBLIOTECAVIRTUAL);
+        if (mibiblioteca != null) {
+            ((BibliotecaVirtual) mibiblioteca).updatePostBlockSync();
+        }
+
+        JInternalFrame biblioteca = getWindow(Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+        if (biblioteca != null) {
+            ((BibliotecaVirtual) biblioteca).updatePostBlockSync();
+        }
+    }
+
     public void ActivateFrame(JInternalFrame ventana) {
         try {
             ventana.setIcon(false);
@@ -306,7 +324,7 @@ public class CentralGUI extends JFrame implements ActionListener {
 
                 break;
             case Constantes.MENU_OPCION_Bilioteca_MyVirtual:
-                JInternalFrame Mi_biblioteca_virtual = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
+                JInternalFrame Mi_biblioteca_virtual = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_MI_BIBLIOTECAVIRTUAL);
                 if (Mi_biblioteca_virtual != null) {
                     ActivateFrame(Mi_biblioteca_virtual);
                 } else {
@@ -320,7 +338,7 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (biblioteca_virtual != null) {
                     ActivateFrame(biblioteca_virtual);
                 } else {
-                    biblioteca_virtual =new BibliotecaVirtual(this, true); 
+                    biblioteca_virtual = new BibliotecaVirtual(this, true);
                     MultiWindowDesk.add(biblioteca_virtual);
                     ActivateFrame(biblioteca_virtual);
                 }
@@ -330,7 +348,7 @@ public class CentralGUI extends JFrame implements ActionListener {
                 if (settings != null) {
                     ActivateFrame(settings);
                 } else {
-                    settings =new Settings(this, this.LibraryManager.getNetworkManager()); 
+                    settings = new Settings(this, this.LibraryManager.getNetworkManager());
                     MultiWindowDesk.add(settings);
                     ActivateFrame(settings);
                 }
@@ -385,6 +403,26 @@ public class CentralGUI extends JFrame implements ActionListener {
                     ActivateFrame(reporte_bi);
                 }
                 break;
+            case Constantes.MENU_OPCION_Reportes_BlockCHain:
+                JInternalFrame reporte_blc = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_REPORTE_BINDIVIDUAL);
+                if (reporte_blc != null) {
+                    ActivateFrame(reporte_blc);
+                } else {
+                    reporte_blc = new ReporteBlockChain(this);
+                    MultiWindowDesk.add(reporte_blc);
+                    ActivateFrame(reporte_blc);
+                }
+                break;
+            case Constantes.MENU_OPCION_Reportes_NetworkList:
+                JInternalFrame reporte_NR = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_REPORTE_NODOSRED);
+                if (reporte_NR != null) {
+                    ActivateFrame(reporte_NR);
+                } else {
+                    reporte_NR = new ReportNR(this);
+                    MultiWindowDesk.add(reporte_NR);
+                    ActivateFrame(reporte_NR);
+                }
+                break;
             case Constantes.MENU_OPCION_BLOCKCHAIN_SYNC:
                 JInternalFrame sync_block = existWindow(MultiWindowDesk, Constantes.GUI_VENTANA_SYNCBLOCK);
                 if (sync_block != null) {
@@ -394,6 +432,11 @@ public class CentralGUI extends JFrame implements ActionListener {
                     MultiWindowDesk.add(sync_block);
                     ActivateFrame(sync_block);
                 }
+                break;
+            case Constantes.MENU_OPCION_Bilioteca_salir:
+                LibraryManager.getNetworkManager().getClient().requestDelNetworkNode();
+                LibraryManager.getBlockChain().generateBlockListFile();
+                System.exit(0);
                 break;
         }
     }

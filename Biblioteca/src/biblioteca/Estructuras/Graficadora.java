@@ -73,7 +73,6 @@ public class Graficadora {
             grafica = new FileOutputStream(tempDir + "\\Usuarios.dot");
             p = new PrintStream(grafica);
             p.println(codigoGraphviz);
-            System.out.println("El Codigo para la grafica es: " + codigoGraphviz);
             p.close();
             Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + tempDir + "\\Usuarios.dot -o " + tempDir + "\\Usuarios.png");
             runtime.waitFor();
@@ -94,10 +93,111 @@ public class Graficadora {
         return "";
     }
 
+    public String ImprimirNodosRed() {
+        FileOutputStream grafica = null;
+        try {
+
+            String property = "java.io.tmpdir";
+            String tempDir = System.getProperty(property);
+
+            String codigoGraphviz = "digraph NodosRED{\n"
+                    + "rankdir=LR;\n"
+                    + "layout=dot;\n"
+                    + "node[shape=\"rectangle\"];\n\n";
+            int prev = -1;
+            NodoSimple temp = LibraryManager.getNetworkManager().getNetworkList().getHead();
+            while (temp != null) {
+                if (temp.getAnterior() != null) {
+                    codigoGraphviz = codigoGraphviz + temp.getAnterior().getIP().replaceAll("\\.", "") + " -> " + temp.getIP().replaceAll("\\.", "") + ";\n";
+                }
+                codigoGraphviz = codigoGraphviz + temp.getIP().replaceAll("\\.", "") + " [label=\" IP: " + temp.getIP()
+                        + "&#92;n Puerto: " + temp.getServerPort() + "\"];\n";
+                
+                temp = temp.getSiguiente();
+            }
+
+            codigoGraphviz = codigoGraphviz + "}";
+            PrintStream p;
+            grafica = new FileOutputStream(tempDir + "\\NodosRED.dot");
+            p = new PrintStream(grafica);
+            p.println(codigoGraphviz);
+            p.close();
+            Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + tempDir + "\\NodosRED.dot -o " + tempDir + "\\NodosRED.png");
+            runtime.waitFor();
+            return tempDir + "\\NodosRED.png";
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                grafica.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return "";
+    }
+    
+    public String ImprimirBlockChain() {
+        FileOutputStream grafica = null;
+        try {
+
+            String property = "java.io.tmpdir";
+            String tempDir = System.getProperty(property);
+
+            String codigoGraphviz = "digraph BlockChain{\n"
+                    + "rankdir=TB;\n"
+                    + "layout=dot;\n"
+                    + "node[shape=\"rectangle\"];\n\n";
+            int prev = -1;
+            ChainNode temp = LibraryManager.getBlockChain().getHead();
+            while (temp != null) {
+                if (temp.getPrev() != null) {
+                    codigoGraphviz = codigoGraphviz + temp.getPrev().getIndex() + " -> " + temp.getIndex() + ";\n";
+                }
+                codigoGraphviz = codigoGraphviz + temp.getIndex() + " [label=\" Index: " + temp.getIndex()
+                        + "&#92;n TimeStamp: " + temp.getTimeStamp()
+                        + "&#92;n Nonce: " + temp.getNONCE()
+                        + "&#92;n Previous Hash: " + temp.getPrevHash()
+                        + "&#92;n Hash: " + temp.getHash()+ "\"];\n";
+                
+                temp = temp.getNext();
+            }
+
+            codigoGraphviz = codigoGraphviz + "}";
+            PrintStream p;
+            grafica = new FileOutputStream(tempDir + "\\BlockChain.dot");
+            p = new PrintStream(grafica);
+            p.println(codigoGraphviz);
+            p.close();
+            Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + tempDir + "\\BlockChain.dot -o " + tempDir + "\\BlockChain.png");
+            runtime.waitFor();
+            return tempDir + "\\BlockChain.png";
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                grafica.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return "";
+    }
+
     /* Graficar Arbol AVL */
     public String ImprimirCategorias(int Tipo) {
         NodoAVL temp = LibraryManager.getLibrero().getRaiz();
-        if(temp==null) return "";
+        if (temp == null) {
+            return "";
+        }
         FileOutputStream grafica = null;
         try {
 
@@ -116,7 +216,6 @@ public class Graficadora {
                         + "node[shape=\"rectangle\"];\n\n";
             }
 
-            
             puntero = 0;
             switch (Tipo) {
                 case 0:
@@ -169,7 +268,6 @@ public class Graficadora {
 
             p = new PrintStream(grafica);
             p.println(codigoGraphviz);
-            System.out.println("El Codigo para la grafica es: " + codigoGraphviz);
             p.close();
             Process runtime = null;
             switch (Tipo) {
@@ -277,29 +375,28 @@ public class Graficadora {
 
             String property = "java.io.tmpdir";
             String tempDir = System.getProperty(property);
-            
+
             codigoGraphviz = "digraph Libros{\n"
                     + "rankdir=TB;\n"
                     + "layout=dot;\n"
                     + "node[shape=record];\n\n";
-            
+
             NodoB Raiz = Librero.getRaiz();
-            if(Raiz == null){
+            if (Raiz == null) {
                 System.out.println("El Arbol esta vacio.");
-            }else{
+            } else {
                 Niveles(Raiz);
             }
-            
+
             codigoGraphviz = codigoGraphviz + "}";
             PrintStream p;
-            grafica = new FileOutputStream(tempDir + "\\Libros"+Nombre.replaceAll(" ","_")+".dot");
+            grafica = new FileOutputStream(tempDir + "\\Libros" + Nombre.replaceAll(" ", "_") + ".dot");
             p = new PrintStream(grafica);
             p.println(codigoGraphviz);
-            System.out.println("El Codigo para la grafica es: " + codigoGraphviz);
             p.close();
-            Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + tempDir + "\\Libros"+Nombre.replaceAll(" ","_")+".dot -o " + tempDir + "\\Libros"+Nombre.replaceAll(" ","_")+".png");
+            Process runtime = Runtime.getRuntime().exec("cmd /c dot -Tpng " + tempDir + "\\Libros" + Nombre.replaceAll(" ", "_") + ".dot -o " + tempDir + "\\Libros" + Nombre.replaceAll(" ", "_") + ".png");
             runtime.waitFor();
-            return tempDir + "\\Libros"+Nombre.replaceAll(" ","_")+".png";
+            return tempDir + "\\Libros" + Nombre.replaceAll(" ", "_") + ".png";
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Graficadora.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -321,98 +418,98 @@ public class Graficadora {
         while (temp != null) {
             switch (temp.getKeySize()) {
                 case 1:
-                    codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+" [label=\"{{<f0> ISBN: "+temp.getKey1().getClave()+"&#92;n Titulo: "+divideName(temp.getKey1().getData().getTitle())+" }           | { <f4> | <f5> }}\"];\n";
+                    codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + " [label=\"{{<f0> ISBN: " + temp.getKey1().getClave() + "&#92;n Titulo: " + divideName(temp.getKey1().getData().getTitle()) + " }           | { <f4> | <f5> }}\"];\n";
                     if (temp.getKey1().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f4 -> nodo"+temp.getKey1().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f4 -> nodo" + temp.getKey1().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey1().getMayores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f5 -> nodo"+temp.getKey1().getMayores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f5 -> nodo" + temp.getKey1().getMayores().getKey1().getClave() + "\n";
                     }
                     break;
                 case 2:
-                    codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+" [label=\"{{<f0> ISBN: "+temp.getKey1().getClave()+"&#92;n Titulo: "+divideName(temp.getKey1().getData().getTitle())+" | <f1> ISBN: "+temp.getKey2().getClave()+"&#92;n Titulo: "+divideName(temp.getKey2().getData().getTitle())+"  }           | { <f4> | <f5> | <f6> }}\"];\n";
-                    
+                    codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + " [label=\"{{<f0> ISBN: " + temp.getKey1().getClave() + "&#92;n Titulo: " + divideName(temp.getKey1().getData().getTitle()) + " | <f1> ISBN: " + temp.getKey2().getClave() + "&#92;n Titulo: " + divideName(temp.getKey2().getData().getTitle()) + "  }           | { <f4> | <f5> | <f6> }}\"];\n";
+
                     if (temp.getKey1().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f4 -> nodo"+temp.getKey1().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f4 -> nodo" + temp.getKey1().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey2().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f5 -> nodo"+temp.getKey2().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f5 -> nodo" + temp.getKey2().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey2().getMayores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f6 -> nodo"+temp.getKey2().getMayores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f6 -> nodo" + temp.getKey2().getMayores().getKey1().getClave() + "\n";
                     }
                     break;
                 case 3:
-                    codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+" [label=\"{{<f0> ISBN: "+temp.getKey1().getClave()+"&#92;n Titulo: "+divideName(temp.getKey1().getData().getTitle())+" | <f1> ISBN: "+temp.getKey2().getClave()+"&#92;n Titulo: "+divideName(temp.getKey2().getData().getTitle())+" | <f2> ISBN: "+temp.getKey3().getClave()+"&#92;n Titulo: "+divideName(temp.getKey3().getData().getTitle())+" }           | { <f4> | <f5> | <f6> | <f7> }}\"];\n";
-                    
+                    codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + " [label=\"{{<f0> ISBN: " + temp.getKey1().getClave() + "&#92;n Titulo: " + divideName(temp.getKey1().getData().getTitle()) + " | <f1> ISBN: " + temp.getKey2().getClave() + "&#92;n Titulo: " + divideName(temp.getKey2().getData().getTitle()) + " | <f2> ISBN: " + temp.getKey3().getClave() + "&#92;n Titulo: " + divideName(temp.getKey3().getData().getTitle()) + " }           | { <f4> | <f5> | <f6> | <f7> }}\"];\n";
+
                     if (temp.getKey1().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f4 -> nodo"+temp.getKey1().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f4 -> nodo" + temp.getKey1().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey2().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f5 -> nodo"+temp.getKey2().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f5 -> nodo" + temp.getKey2().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey3().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f6 -> nodo"+temp.getKey3().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f6 -> nodo" + temp.getKey3().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey3().getMayores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f7 -> nodo"+temp.getKey3().getMayores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f7 -> nodo" + temp.getKey3().getMayores().getKey1().getClave() + "\n";
                     }
                     break;
                 case 4:
-                    codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+" [label=\"{{<f0> ISBN: "+temp.getKey1().getClave()+"&#92;n Titulo: "+divideName(temp.getKey1().getData().getTitle())+" | <f1> ISBN: "+temp.getKey2().getClave()+"&#92;n Titulo: "+divideName(temp.getKey2().getData().getTitle())+" | <f2> ISBN: "+temp.getKey3().getClave()+"&#92;n Titulo: "+divideName(temp.getKey3().getData().getTitle())+" | <f3> ISBN: "+temp.getKey4().getClave()+"&#92;n Titulo: "+divideName(temp.getKey4().getData().getTitle())+" }           | { <f4> | <f5> | <f6> | <f7> |<f8>}}\"];\n";
+                    codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + " [label=\"{{<f0> ISBN: " + temp.getKey1().getClave() + "&#92;n Titulo: " + divideName(temp.getKey1().getData().getTitle()) + " | <f1> ISBN: " + temp.getKey2().getClave() + "&#92;n Titulo: " + divideName(temp.getKey2().getData().getTitle()) + " | <f2> ISBN: " + temp.getKey3().getClave() + "&#92;n Titulo: " + divideName(temp.getKey3().getData().getTitle()) + " | <f3> ISBN: " + temp.getKey4().getClave() + "&#92;n Titulo: " + divideName(temp.getKey4().getData().getTitle()) + " }           | { <f4> | <f5> | <f6> | <f7> |<f8>}}\"];\n";
                     if (temp.getKey1().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f4 -> nodo"+temp.getKey1().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f4 -> nodo" + temp.getKey1().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey2().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f5 -> nodo"+temp.getKey2().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f5 -> nodo" + temp.getKey2().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey3().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f6 -> nodo"+temp.getKey3().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f6 -> nodo" + temp.getKey3().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey4().getMenores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f7 -> nodo"+temp.getKey4().getMenores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f7 -> nodo" + temp.getKey4().getMenores().getKey1().getClave() + "\n";
                     }
 
                     if (temp.getKey4().getMayores() != null) {
-                        codigoGraphviz = codigoGraphviz + "nodo"+temp.getKey1().getClave()+":f8 -> nodo"+temp.getKey4().getMayores().getKey1().getClave()+"\n";
+                        codigoGraphviz = codigoGraphviz + "nodo" + temp.getKey1().getClave() + ":f8 -> nodo" + temp.getKey4().getMayores().getKey1().getClave() + "\n";
                     }
                     break;
                 default:
-                    System.out.println("Sin programar aun este caso.");
+                    //System.out.println("Sin programar aun este caso.");
                     break;
             }
             temp = temp.getBB();
         }
-        
+
         if (Izquierda.getKey1() != null && Izquierda.getKey1().getMenores() != null) {
             Niveles(Izquierda.getKey1().getMenores());
         }
 
     }
-    
-    public String divideName(String name){
+
+    public String divideName(String name) {
         String salida = "";
-        if(name.length()>25){
+        if (name.length() > 25) {
             int a = 0;
-            while(a<name.length()){
-                if((a+25) < name.length()){
-                    salida = salida +name.substring(a, a+25)+"&#92;n";
-                    a = a+25;
-                }else{
-                    salida = salida +name.substring(a, a+(name.length()-a))+"&#92;n";
-                    a = a+(name.length()-a);
+            while (a < name.length()) {
+                if ((a + 25) < name.length()) {
+                    salida = salida + name.substring(a, a + 25) + "&#92;n";
+                    a = a + 25;
+                } else {
+                    salida = salida + name.substring(a, a + (name.length() - a)) + "&#92;n";
+                    a = a + (name.length() - a);
                 }
             }
-        }else{
+        } else {
             salida = name;
         }
         return salida;

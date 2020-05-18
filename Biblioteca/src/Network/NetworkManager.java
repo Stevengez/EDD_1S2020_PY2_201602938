@@ -61,7 +61,7 @@ public class NetworkManager {
             this.Server = new Server(LibraryManager);
             this.Server.start();
         }else{
-            System.out.println("Ya esta corriendo el servidor");
+            System.out.println("NetManager:: El Servidor ya fue creado.");
         }
     }
     
@@ -88,28 +88,17 @@ public class NetworkManager {
                 }
             }.start();
         }else{
-            System.out.println("Servidor broadcast ya se esta ejecutando");
+            System.out.println("NetManager:: Servidor broadcast ya fue creado");
         }
     }
     
     public void registerMySelf(String IP){
-        System.out.println("Registe mi propia IP:"+IP);
         getNetworkList().replaceHead(IP, getServerPort());
     }
 
     public void createClienteBroadCast(JInternalFrame Context) {
-        //final NetworkManager esta = this;
         IPRegistration recolector = new IPRegistration(this);
         recolector.createClient(Context);
-        /*new Thread() {
-            @Override
-            public void run() {
-                IPRegistration recolector = new IPRegistration(esta);
-                recolector.createClient();
-            }
-
-        }.start();
-         */
     }
     
     public void saveToConfigFile() {
@@ -132,7 +121,7 @@ public class NetworkManager {
         configuraciones.put(Constantes.RED_HOST_SYNC, Constantes.RED_DEFAULT_HOST_SYNC);
         configuraciones.put(Constantes.RED_PORT_SYNC, Constantes.RED_DEFAULT_PORT_SYNC);
         red.add(configuraciones);
-        config.put("RED", red);
+        config.put(Constantes.JSON_RED_LABEL, red);
         writeToFile(defaultsettings.getAbsolutePath(), config.toJSONString());
     }
 

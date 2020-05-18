@@ -38,12 +38,10 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
             setTitle("Biblioteca Virtual");
             setName(Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
         } else {
-            setTitle("Mi Biblioteca Virtual ("+Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getNombre()+")");
+            setTitle("Mi Biblioteca Virtual (" + Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getNombre() + ")");
             setName(Constantes.GUI_VENTANA_MI_BIBLIOTECAVIRTUAL);
         }
-
         initComponents();
-
         setJMenuBar(crearMenu());
         updateCatList();
         CatList.setSelectedIndex(0);
@@ -73,6 +71,16 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
         setMaximizable(true);
         setResizable(true);
         setVisible(true);
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         FIltroPanel.setBackground(java.awt.SystemColor.info);
 
@@ -179,11 +187,41 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void updatePostBlockSync() {
+        String actual_cat = "";
+        if(CatList.getSelectedIndex()<1){
+            actual_cat = "Sin Filtro";
+        }else{
+            actual_cat = cats[CatList.getSelectedIndex() - 1].getNombre();
+        }
+        
+        updateCatList();
+        int f = -1;
+        for (int x = 1; x < cats.length; x++) {
+            if (cats[x].getNombre().equals(actual_cat)) {
+                f = x;
+            }
+        }
+        ignoreChange = false;
+        if (f != (-1)) {
+            CatList.setSelectedIndex(f);
+        } else {
+            CatList.setSelectedIndex(0);
+        }
+    }
+
+    private void checkPendingUpdate() {
+        if (Centralgui.getLibraryManager().getBlockChain().isPendingChange()) {
+            updatePostBlockSync();
+            Centralgui.getLibraryManager().getBlockChain().setPendingChange(false);
+        }
+    }
+
     private void CatListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CatListActionPerformed
         if (ignoreChange) {
             ignoreChange = false;
         } else {
-            System.out.println("Hiciste algo con las categorias");
+            checkPendingUpdate();
             if (CatList.getSelectedIndex() == 0) {
                 mostrarLibros(Centralgui.getLibraryManager().getLibreroGlobal());
                 EliminarCategoria.setEnabled(false);
@@ -212,7 +250,6 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
                     for (int x = 0; x < libros.length; x++) {
                         Centralgui.getLibraryManager().getLibreroGlobal().RemoveBook(libros[x].getISBN(), true);
                     }
-                    System.out.println("Elimine una Categoria con " + libros.length + " libros.");
                 }
                 updateCatList();
             } else {
@@ -228,10 +265,10 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
     }//GEN-LAST:event_EliminarCategoriaActionPerformed
 
     private void BuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarActionPerformed
-        if (this.BusquedaInput.getText() == "" || this.BusquedaInput.getText().matches("[\\s]+")) {
+        checkPendingUpdate();
+        if (this.BusquedaInput.getText().equals("") || this.BusquedaInput.getText().matches("[\\s]+")) {
             JOptionPane.showMessageDialog(this, "El criterio de busqueda es invalido");
         } else {
-            System.out.println("Hiciste algo con las categorias");
             if (CatList.getSelectedIndex() == 0) {
                 mostrarLibros(Centralgui.getLibraryManager().getLibreroGlobal());
                 EliminarCategoria.setEnabled(false);
@@ -257,31 +294,57 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
     private void BusquedaInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BusquedaInputKeyReleased
         if (this.BusquedaInput.getText() == "" || this.BusquedaInput.getText().matches("[\\s]+")) {
             this.Filtro = false;
+            checkPendingUpdate();
         } else {
             this.Filtro = true;
         }
     }//GEN-LAST:event_BusquedaInputKeyReleased
 
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+
+    }//GEN-LAST:event_formFocusGained
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        checkPendingUpdate();
+    }//GEN-LAST:event_formMouseClicked
+
     private JMenuBar crearMenu() {
         JMenuBar menu_superior = new JMenuBar();
         JMenu menu_opcion_Opciones = new JMenu("Opciones");
-        
-        JMenuItem menu_opcion_cuenta = new JMenuItem("Mi Cuenta");
+        JMenuItem menu_opcion_cuenta = null;
+        JMenuItem menu_opcion_categoria = null;
+        if (Global) {
+            menu_opcion_cuenta = new JMenuItem("Crear Usuario");
+        } else {
+            menu_opcion_cuenta = new JMenuItem("Mi Cuenta");
+            menu_opcion_categoria = new JMenuItem("Crear Categoria");
+        }
+
         JMenuItem menu_opcion_crear = new JMenuItem("Crear Libro");
-        
-        menu_opcion_cuenta.setActionCommand(Constantes.MENU_OPCION_Bilioteca_MyProfile);
+
+        if (Global) {
+            menu_opcion_cuenta.setActionCommand(Constantes.MENU_OPCION_Bilioteca_CreateUser);
+        } else {
+            menu_opcion_cuenta.setActionCommand(Constantes.MENU_OPCION_Bilioteca_MyProfile);
+            menu_opcion_categoria.setActionCommand(Constantes.MENU_OPCION_Bilioteca_CreateCat);
+        }
+
         menu_opcion_crear.setActionCommand(Constantes.MENU_OPCION_Bilioteca_Create_NewBook);
-        
+
         menu_opcion_cuenta.addActionListener(this);
         menu_opcion_crear.addActionListener(this);
 
         if (Global) {
             menu_opcion_crear.setEnabled(false);
-            menu_opcion_cuenta.setEnabled(false);
+        } else {
+            menu_opcion_categoria.addActionListener(this);
         }
 
         menu_opcion_Opciones.add(menu_opcion_cuenta);
-        menu_opcion_Opciones.add(menu_opcion_crear);
+        if (!Global) {
+            menu_opcion_Opciones.add(menu_opcion_crear);
+            menu_opcion_Opciones.add(menu_opcion_categoria);
+        }
         menu_superior.add(menu_opcion_Opciones);
         return menu_superior;
     }
@@ -334,35 +397,68 @@ public class BibliotecaVirtual extends javax.swing.JInternalFrame implements Act
                 }
             }
         }
-
-        System.out.println("Termine, vamos a repintar.");
         pack();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case Constantes.MENU_OPCION_Bilioteca_MyProfile:
-                JInternalFrame Mi_Perfil = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_BIBLIOTECAVIRTUAL);
-                if (Mi_Perfil != null) {
-                    Centralgui.ActivateFrame(Mi_Perfil);
+            case Constantes.MENU_OPCION_Bilioteca_CreateUser:
+                JInternalFrame Crear_Usuario = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_CREAR_USUARIO);
+                if (Crear_Usuario != null) {
+                    Centralgui.ActivateFrame(Crear_Usuario);
                 } else {
-                    Mi_Perfil = new MiPerfil(Centralgui, this);
-                    Centralgui.getDesktop().add(Mi_Perfil);
-                    Centralgui.ActivateFrame(Mi_Perfil);
+                    Crear_Usuario = new CrearUsuario(Centralgui);
+                    Centralgui.getDesktop().add(Crear_Usuario);
+                    Centralgui.ActivateFrame(Crear_Usuario);
+                }
+                break;
+            case Constantes.MENU_OPCION_Bilioteca_CreateCat:
+                if (Centralgui.getLibraryManager().getNetworkManager().getLoggedUser() != null) {
+                JInternalFrame Crear_Categoria = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_CREAR_CATEGORIA);
+                if (Crear_Categoria != null) {
+                    Centralgui.ActivateFrame(Crear_Categoria);
+                } else {
+                    Crear_Categoria = new CrearCategoria(Centralgui);
+                    Centralgui.getDesktop().add(Crear_Categoria);
+                    Centralgui.ActivateFrame(Crear_Categoria);
+                }
+                }else{
+                    JOptionPane.showMessageDialog(this, "Vuelve a iniciar sesion");
+                    this.dispose();
+                }
+                break;
+            case Constantes.MENU_OPCION_Bilioteca_MyProfile:
+                if (Centralgui.getLibraryManager().getNetworkManager().getLoggedUser() != null) {
+                    JInternalFrame Mi_Perfil = Centralgui.existWindow(Centralgui.getDesktop(), Constantes.GUI_VENTANA_MYPROFILE);
+                    if (Mi_Perfil != null) {
+                        Centralgui.ActivateFrame(Mi_Perfil);
+                    } else {
+                        Mi_Perfil = new MiPerfil(Centralgui, this);
+                        Centralgui.getDesktop().add(Mi_Perfil);
+                        Centralgui.ActivateFrame(Mi_Perfil);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Vuelve a iniciar sesion");
+                    this.dispose();
                 }
                 break;
             case Constantes.MENU_OPCION_Bilioteca_Create_NewBook:
+                if (Centralgui.getLibraryManager().getNetworkManager().getLoggedUser() != null) {
                     CrearLibro Nuevo_Libro;
-                    if(CatList.getSelectedIndex()==0){
-                         Nuevo_Libro = new CrearLibro(Centralgui);
-                    }else{
-                        Nuevo_Libro = new CrearLibro(Centralgui, cats[CatList.getSelectedIndex()-1].getNombre());
+                    if (CatList.getSelectedIndex() == 0) {
+                        Nuevo_Libro = new CrearLibro(Centralgui);
+                    } else {
+                        Nuevo_Libro = new CrearLibro(Centralgui, cats[CatList.getSelectedIndex() - 1].getNombre());
                     }
                     Centralgui.getDesktop().add(Nuevo_Libro);
                     Centralgui.ActivateFrame(Nuevo_Libro);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Vuelve a iniciar sesion");
+                    this.dispose();
+                }
                 break;
-                
+
         }
     }
 

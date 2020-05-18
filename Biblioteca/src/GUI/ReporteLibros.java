@@ -7,6 +7,11 @@ package GUI;
 
 import JSONCreator.Constantes;
 import biblioteca.Estructuras.ArbolB;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**
@@ -43,7 +48,11 @@ public class ReporteLibros extends javax.swing.JInternalFrame {
     
     public void cargarImagen(){
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirLibros(Nombre, Librero);
-        ArbolImagen.setIcon(new ImageIcon(ruta));
+        try {   
+            ArbolImagen.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -90,7 +99,11 @@ public class ReporteLibros extends javax.swing.JInternalFrame {
     private void ArbolImagenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ArbolImagenMouseClicked
         System.out.println("Clicaste la imagen.");
         String ruta = Centralgui.getLibraryManager().getImpresora().ImprimirLibros(Nombre,Librero);
-        ArbolImagen.setIcon(new ImageIcon(ruta));
+        try {   
+            ArbolImagen.setIcon(new ImageIcon(ImageIO.read(new File(ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_ArbolImagenMouseClicked
 
 

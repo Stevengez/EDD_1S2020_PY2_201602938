@@ -7,6 +7,11 @@ package GUI;
 
 import JSONCreator.Constantes;
 import biblioteca.Biblioteca;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**
@@ -39,7 +44,11 @@ public class ReporteTH extends javax.swing.JInternalFrame {
     public void cargarImagen(){
         imagen_ruta = this.LibraryManager.getImpresora().ImprimirUsuarios();
         System.out.println("La imagen esta en: "+imagen_ruta);
-        ImagenUsuarios.setIcon(new ImageIcon(imagen_ruta));   
+        try {   
+            ImagenUsuarios.setIcon(new ImageIcon(ImageIO.read(new File(imagen_ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }
         ImagenUsuarios.setText("");
     }
 
@@ -106,8 +115,12 @@ public class ReporteTH extends javax.swing.JInternalFrame {
 
     private void ImagenUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ImagenUsuariosMouseClicked
         imagen_ruta = this.LibraryManager.getImpresora().ImprimirUsuarios();
-        System.out.println("La imagen esta en: "+imagen_ruta);
-        ImagenUsuarios.setIcon(new ImageIcon(imagen_ruta));   
+        System.out.println("Reporte:: Cargando la imagen desde: "+imagen_ruta);
+        try {   
+            ImagenUsuarios.setIcon(new ImageIcon(ImageIO.read(new File(imagen_ruta))));
+        } catch (IOException ex) {
+            Logger.getLogger(ReporteTH.class.getName()).log(Level.SEVERE, null, ex);
+        }        
         ImagenUsuarios.setText("");
     }//GEN-LAST:event_ImagenUsuariosMouseClicked
 

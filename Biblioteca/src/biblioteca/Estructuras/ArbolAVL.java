@@ -42,25 +42,27 @@ public class ArbolAVL {
         if (Raiz == null) {
             NodoAVL nuevo = new NodoAVL(Data);
             Raiz = nuevo;
-            System.out.println("Cree la Raiz: " + nuevo.getData().getNombre());
+            //System.out.println("Cree la Raiz: " + nuevo.getData().getNombre());
             this.Size++;
 
             if (!LocalJSON) {
                 /* Agregar Operacion al Bloque */
-                JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), nuevo.getData());
+                JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), Data);
             }
 
             return nuevo;
         } else {
+            //System.out.println("Creando desde arriba: "+Data.getNombre());
             NodoAVL nuevo = Insert(Raiz, Data);
             if (nuevo == null) {
-                System.out.println("Ya existe esta categoria.");
+                //System.out.println("Ya existe esta categoria.");
                 return null;
             } else {
+                //System.out.println("Voy a regresar la nueva Categoria recien creada: "+nuevo.getData().getNombre());
                 this.Size++;
                 if (!LocalJSON) {
                     /* Agregar Operacion al Bloque */
-                    JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), nuevo.getData());
+                    JSONCreator.addCategoryOperation(JSONCreator.getCurrentBlock(), Data);
                 }
                 return nuevo;
             }
@@ -78,7 +80,6 @@ public class ArbolAVL {
                     Padre.setbFact(1);
                     Padre.AddSubLevel();
                 }
-                //System.out.println("Colocando "+nuevo.getData().getNombre()+" a la Derecha de: "+Padre.getData().getNombre());
                 Padre.setDerecha(nuevo);
                 nuevo.setPadre(Padre);
                 return nuevo;
@@ -116,9 +117,9 @@ public class ArbolAVL {
             if (Nodo.getIzquierda() != null && Nodo.getDerecha() != null) {
                 if (Nodo.getIzquierda().getSubLevels() + 1 > Nodo.getDerecha().getSubLevels() + 1) {
                     Nodo.setSubLevels(Nodo.getIzquierda().getSubLevels() + 1);
-                    //System.out.println("Sume un subnivel a: "+Nodo.getData().getNombre()+" porque La izquierda era mas grande");
+                    ////System.out.println("Sume un subnivel a: "+Nodo.getData().getNombre()+" porque La izquierda era mas grande");
                 } else if (Nodo.getDerecha().getSubLevels() + 1 > Nodo.getIzquierda().getSubLevels() + 1) {
-                    //System.out.println("Sume un subnivel a: "+Nodo.getData().getNombre()+" porque La derecha era mas grande");
+                    ////System.out.println("Sume un subnivel a: "+Nodo.getData().getNombre()+" porque La derecha era mas grande");
                     Nodo.setSubLevels(Nodo.getDerecha().getSubLevels() + 1);
                 } else {
                     Nodo.setSubLevels(Nodo.getDerecha().getSubLevels() + 1);
@@ -139,7 +140,7 @@ public class ArbolAVL {
         if (Nodo != null) {
             if (Nodo.getIzquierda() != null && Nodo.getDerecha() != null) {
                 Nodo.setbFact((Nodo.getDerecha().getSubLevels() + 1) - (Nodo.getIzquierda().getSubLevels() + 1));
-                //System.out.println("Calculado en factor de:" + Nodo.getData().getNombre());
+                ////System.out.println("Calculado en factor de:" + Nodo.getData().getNombre());
             } else if (Nodo.getIzquierda() != null) {
                 Nodo.setbFact(-1 * (Nodo.getIzquierda().getSubLevels() + 1));
             } else if (Nodo.getDerecha() != null) {
@@ -149,7 +150,7 @@ public class ArbolAVL {
             }
 
             if (Nodo.getBFact() > 1 || Nodo.getBFact() < -1) {
-                System.out.println(Nodo.getData().getNombre() + " requiere Balanceo.");
+                //System.out.println(Nodo.getData().getNombre() + " requiere Balanceo.");
             }
         }
     }
@@ -159,9 +160,9 @@ public class ArbolAVL {
         if (this.Raiz == null) {
             return null;
         } else {
-            NodoAVL temp = Buscar(Raiz, new Categoria(Categoria, 0));
+            NodoAVL temp = Buscar(Raiz, Categoria);
             if (temp == null) {
-                System.out.println("No se encontro esa categoria.");
+                //System.out.println("No se encontro esa categoria.");
             }
             return temp;
         }
@@ -169,35 +170,40 @@ public class ArbolAVL {
     }
 
     /* ---------------- BUSQUEDA Y CREACION NODOS ---------------- */
-    public NodoAVL BuscarYCrear(String Categoria, int Carnet, boolean LocalJSON) {
+    public Categoria BuscarYCrear(String Categoria, int Carnet, boolean LocalJSON) {
         if (this.Raiz == null) {
-            return InsertNew(new Categoria(Categoria, Carnet), LocalJSON);
+            Categoria nueva = new Categoria(Categoria, Carnet);
+            InsertNew(nueva, LocalJSON);
+            return nueva;
         } else {
-            NodoAVL temp = Buscar(Raiz, new Categoria(Categoria, 0));
+            NodoAVL temp = Buscar(Raiz, Categoria);
             if (temp == null) {
-                return InsertNew(new Categoria(Categoria, Carnet), LocalJSON);
+                Categoria nueva = new Categoria(Categoria, Carnet);
+                InsertNew(nueva, LocalJSON);
+                return nueva;
             }
-            return temp;
+            return temp.getData();
         }
 
     }
 
-    private NodoAVL Buscar(NodoAVL Padre, Categoria Data) {
-        int comparacion = Padre.getData().getNombre().compareToIgnoreCase(Data.getNombre());
+    private NodoAVL Buscar(NodoAVL Padre, String Categoria) {
+        int comparacion = Padre.getData().getNombre().compareToIgnoreCase(Categoria);
 
         if (comparacion < 0) {
             if (Padre.getDerecha() == null) {
                 return null;
             } else {
-                return Buscar(Padre.getDerecha(), Data);
+                return Buscar(Padre.getDerecha(), Categoria);
             }
         } else if (comparacion > 0) {
             if (Padre.getIzquierda() == null) {
                 return null;
             } else {
-                return Buscar(Padre.getIzquierda(), Data);
+                return Buscar(Padre.getIzquierda(), Categoria);
             }
         } else {
+            //System.out.println("La encontre ("+Categoria+"), es: "+Padre.getData().getNombre());
             return Padre;
         }
     }
@@ -222,7 +228,7 @@ public class ArbolAVL {
     public Libro[] EliminarNodo(String Categoria, boolean LocalJSON) {
         NodoAVL temp = Eliminar(this.Raiz, new Categoria(Categoria, 0));
         if (temp == null) {
-            System.out.println("No Existia la categoria");
+            //System.out.println("No Existia la categoria");
             return null;
         } else {
             this.Size--;
@@ -255,7 +261,7 @@ public class ArbolAVL {
 
         if (comparacion < 0) {
             if (Padre.getDerecha() == null) {
-                System.out.println("No Encontre el nodo a eliminar");
+                //System.out.println("No Encontre el nodo a eliminar");
                 return null;
             } else {
                 NodoAVL temp = Eliminar(Padre.getDerecha(), Data);
@@ -271,7 +277,7 @@ public class ArbolAVL {
             }
         } else if (comparacion > 0) {
             if (Padre.getIzquierda() == null) {
-                System.out.println("No Encontre el nodo a eliminar");
+                //System.out.println("No Encontre el nodo a eliminar");
                 return null;
             } else {
                 NodoAVL temp = Eliminar(Padre.getIzquierda(), Data);
@@ -286,15 +292,15 @@ public class ArbolAVL {
                 return temp;
             }
         } else {
-            System.out.println("Encontre el nodo a eliminar");
+            //System.out.println("Encontre el nodo a eliminar");
             NodoAVL temp = Padre;
             if (Padre.getIzquierda() == null && Padre.getDerecha() == null) {
                 Padre.setEliminado(true);
                 if (Padre == this.Raiz) {
                     this.Raiz = null;
-                    System.out.println("Caso especial, Eliminacion de la Raiz");
+                    //System.out.println("Caso especial, Eliminacion de la Raiz");
                 }
-                System.out.println("Eliminacion Simple.");
+                //System.out.println("Eliminacion Simple.");
                 return Padre;
             } else {
                 /* Caso en que Tiene 2 Hijos */
@@ -321,7 +327,7 @@ public class ArbolAVL {
                         UpdateSubLevels(Hijo.getPadre());
                         setBFact(Hijo.getPadre());
                         Balanceo(Hijo.getPadre());
-                        System.out.println("Eliminacion con Intercambio doble (MenordeMayores).");
+                        //System.out.println("Eliminacion con Intercambio doble (MenordeMayores).");
                         return Hijo;
                     } else {
                         /* Si El hijo derecho tiene mas subniveles o son iguales */
@@ -345,18 +351,18 @@ public class ArbolAVL {
                         UpdateSubLevels(Hijo.getPadre());
                         setBFact(Hijo.getPadre());
                         Balanceo(Hijo.getPadre());
-                        System.out.println("Eliminacion con Intercambio doble (MayordeMenores).");
+                        //System.out.println("Eliminacion con Intercambio doble (MayordeMenores).");
                         return Hijo;
                     }
                     /* Solo tiene un hijo */
                 } else if (Padre.getIzquierda() != null) {
-                    System.out.println("Eliminacion con Intercambio Simple.");
+                    //System.out.println("Eliminacion con Intercambio Simple.");
                     return EHI(Padre);
                 } else if (Padre.getDerecha() != null) {
-                    System.out.println("Eliminacion con Intercambio Simple.");
+                    //System.out.println("Eliminacion con Intercambio Simple.");
                     return EHD(Padre);
                 } else {
-                    System.out.println("Erro en la eliminacion.");
+                    //System.out.println("Erro en la eliminacion.");
                     return null;
                 }
             }
@@ -428,18 +434,18 @@ public class ArbolAVL {
         if (Nodo != null) {
             if (Nodo.getBFact() > 1) {
                 if (Nodo.getDerecha().getBFact() < 0) {
-                    System.out.println("Doble Rotacion (Derecha, Izquierda).");
+                    //System.out.println("Doble Rotacion (Derecha, Izquierda).");
                     RDI(Nodo);
                 } else {
-                    System.out.println("Rotacion Simple a la Izquierda.");
+                    //System.out.println("Rotacion Simple a la Izquierda.");
                     RSI(Nodo);
                 }
             } else if (Nodo.getBFact() < -1) {
                 if (Nodo.getIzquierda().getBFact() > 0) {
-                    System.out.println("Doble Rotacion (Izquierda, Derecha).");
+                    //System.out.println("Doble Rotacion (Izquierda, Derecha).");
                     RDD(Nodo);
                 } else {
-                    System.out.println("Rotacion Simple a la Derecha.");
+                    //System.out.println("Rotacion Simple a la Derecha.");
                     RSD(Nodo);
                 }
             }
@@ -482,7 +488,7 @@ public class ArbolAVL {
         UpdateSubLevels(Segundo);
         setBFact(Primero);
         setBFact(Segundo);
-        System.out.println("Termine la rotacion (RSD)");
+        //System.out.println("Termine la rotacion (RSD)");
     }
 
     public void RSI(NodoAVL Nodo) {
@@ -524,19 +530,19 @@ public class ArbolAVL {
         setBFact(Primero);
         setBFact(Segundo);
         setBFact(Tercero);
-        System.out.println("Termine la rotacion (RSI)");
+        //System.out.println("Termine la rotacion (RSI)");
     }
 
     public void RDI(NodoAVL Nodo) {
         RSD(Nodo.getDerecha());
         RSI(Nodo);
-        System.out.println("Termine la rotacion (RDI)");
+        //System.out.println("Termine la rotacion (RDI)");
     }
 
     public void RDD(NodoAVL Nodo) { // Izquierda, Derecha
         RSI(Nodo.getIzquierda());
         RSD(Nodo);
-        System.out.println("Termine la rotacion (RDD)");
+        //System.out.println("Termine la rotacion (RDD)");
     }
 
     /* ------------------------ Get Size --------------------------- */
@@ -547,7 +553,7 @@ public class ArbolAVL {
     /* ---------------- Impresion Grafica del Arbol ---------------- */
     public void ImpresoraGrafica() {
         if (this.Raiz == null) {
-            System.out.println("No hay nodos.");
+            //System.out.println("No hay nodos.");
         } else {
             PreOrderString = "";
             PreOrderString = PreOrderString + "digraph arbolAVL{\n";
@@ -618,7 +624,7 @@ public class ArbolAVL {
             return null;
         }
         EnOrderArray(Raiz);
-        System.out.println("Agrupe " + Puntero + " categorias");
+        //System.out.println("Agrupe " + Puntero + " categorias");
         return AllCategory;
     }
 
@@ -628,19 +634,20 @@ public class ArbolAVL {
         if (Raiz == null) {
             return null;
         }
+
         EnOrderArray(Raiz, Carnet);
-        
+
         Categoria[] retorno = new Categoria[Puntero];
-        for(int a=0;a<Puntero;a++){
+        for (int a = 0; a < Puntero; a++) {
             retorno[a] = AllCategory[a];
         }
         AllCategory = null;
-        System.out.println("Agrupe " + Puntero + " categorias con filtro");
+        //System.out.println("Agrupe " + Puntero + " categorias con filtro");
         return retorno;
     }
 
     public void EnOrder(NodoAVL Padre) {
-        System.out.println(Padre.getData().getNombre() + ": " + Padre.getSubLevels() + " BFact: " + Padre.getBFact());
+        //System.out.println(Padre.getData().getNombre() + ": " + Padre.getSubLevels() + " BFact: " + Padre.getBFact());
 
         if (Padre.getIzquierda() != null) {
             EnOrder(Padre.getIzquierda());
@@ -680,6 +687,9 @@ public class ArbolAVL {
                 }
             }
             if (put_this_cat) {
+                AllCategory[Puntero] = Padre.getData();
+                Puntero++;
+            } else if (Padre.getData().getPublisher() == Carnet) {
                 AllCategory[Puntero] = Padre.getData();
                 Puntero++;
             }

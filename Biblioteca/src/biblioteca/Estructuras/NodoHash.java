@@ -40,7 +40,7 @@ public class NodoHash {
                 this.Padre.addToSize();
                 return nuevo;
             } else {
-                System.out.println("Ya existe este usuario.");
+                System.out.println("Usuarios:: Ya existe este usuario.");
                 return null;
             }
         }
@@ -93,7 +93,7 @@ public class NodoHash {
                 return aux;
             }
         }else{
-            System.out.println("No existia ese usuario.");
+            System.out.println("Usuarios:: No existia ese usuario.");
             return null;
         }
     }

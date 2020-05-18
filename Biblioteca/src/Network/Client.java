@@ -7,21 +7,13 @@ package Network;
 
 import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
-import biblioteca.Biblioteca;
-import biblioteca.Estructuras.ArbolAVL;
 import biblioteca.Estructuras.NodoSimple;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
@@ -40,19 +32,18 @@ public class Client {
     public Client(NetworkManager Context) {
         System.out.println("------ Cliente Creado --------");
         this.NetManager = Context;
-        //connectTo(Context.getHostName(), Context.getPortOut(), Context.getServerPort());
     }
 
     public boolean connectTo(String hostname, int RemoteServerPort, JInternalFrame Context) {
         try {
-            System.out.println("Cliente:: Comenzando conexion a: " + hostname + ":" + RemoteServerPort + " usando el puerto: " + NetManager.getClientPort());
-            Client = new Socket();
-            Client.bind(new InetSocketAddress(NetManager.getClientPort()));
+            System.out.println("Cliente:: Comenzando conexion a: " + hostname + ":" + RemoteServerPort);
+            Client = new Socket(hostname, RemoteServerPort);
             Client.setSoTimeout(Constantes.RED_DEFAULT_TIMEOUT);
-            Client.connect(new InetSocketAddress(hostname, RemoteServerPort));
+            //Client.bind(new InetSocketAddress(NetManager.getHostName(),NetManager.getClientPort()));
+            //Client.connect(new InetSocketAddress(hostname, RemoteServerPort));
             return Client.isConnected();
         } catch (SocketException sex) {
-            JOptionPane.showMessageDialog(Context, "Tiempo de espera agotado.");
+            JOptionPane.showMessageDialog(Context, "Tiempo de espera agotado: " + sex.getMessage());
         } catch (UnknownHostException ux) {
             System.out.println(ux.getMessage());
         } catch (IOException oex) {
@@ -64,10 +55,10 @@ public class Client {
     public void requestCloseSocket() {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-            System.out.println("Envie una solicitud de Cierre");
+            System.out.println("Cliente:: Envie una solicitud de Cierre");
             Enviar.writeObject(Constantes.REQUEST_CLOSESOCKET);
             Client.close();
-            System.out.println("Termine la Conexion A Peticion");
+            System.out.println("Cliente:: Termine la Conexion.");
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -76,10 +67,11 @@ public class Client {
     public String requestNetworkNodes() {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-            System.out.println("Envie una solicitud de Nodos de Red");
+            System.out.println("Cliente:: Envie una solicitud de nodos en la red.");
             Enviar.writeObject(Constantes.REQUEST_NETWORKNODES);
 
             ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
+            System.out.println("Cliente:: Recibi la lista de nodos en la red.");
             String Respuesta = (String) Recibir.readObject();
             return Respuesta;
         } catch (IOException ex) {
@@ -98,11 +90,21 @@ public class Client {
             connectTo(peer.getIP(), peer.getServerPort(), Context);
             try {
                 ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-                System.out.println("Envie una solicitud de agregar nodo a: " + peer.getIP());
+                System.out.println("Cliente:: Envie una solicitud para unirme a la red a: " + peer.getIP());
                 Enviar.writeObject(Constantes.REQUEST_ADD_NETWORKNODE);
                 Enviar.writeObject(JSONCreator.addMeRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()));
+
+                ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
+                String respuesta = (String) Recibir.readObject();
+                if (respuesta.equals(Constantes.REQUEST_ADD_NETWORKNODE_C)) {
+                    System.out.println("Cliente:: " + peer.getIP() + " me agrego a la red.");
+                } else {
+                    System.out.println("Cliente:: " + peer.getIP() + " no me agrego a la red.");
+                }
                 requestCloseSocket();
             } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
             peer = peer.getSiguiente();
@@ -110,28 +112,64 @@ public class Client {
         }
     }
 
+    public void requestDelNetworkNode() {
+        if (NetManager.getNetworkList().getHead() != null) {
+            NodoSimple peer = NetManager.getNetworkList().getHead().getSiguiente();
+            int alcance = 0;
+            boolean correcto = true;
+            while (peer != null) {
+                connectTo(peer.getIP(), peer.getServerPort(), null);
+                try {
+                    ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
+                    System.out.println("Cliente:: Envie una solicitud para removerme de la red a: " + peer.getIP());
+                    Enviar.writeObject(Constantes.REQUEST_DEL_NETWORKNODE);
+                    Enviar.writeObject(JSONCreator.delMeRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()));
+
+                    ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
+                    String respuesta = (String) Recibir.readObject();
+                    if (respuesta.equals(Constantes.REQUEST_DEL_NETWORKNODE_C)) {
+                        System.out.println("Cliente:: " + peer.getIP() + " me elimino a la red.");
+                    } else {
+                        System.out.println("Cliente:: " + peer.getIP() + " no me elimino a la red.");
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        requestCloseSocket();
+                    } catch (Exception a) {
+
+                    }
+                }
+                peer = peer.getSiguiente();
+                alcance++;
+            }
+        }
+    }
+
     public void requestBlockSince(int Index, JInternalFrame Context) {
         try {
             ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-            System.out.println("Envie una solicitud de Bloques desde " + Index);
+            System.out.println("Cliente:: Envie una solicitud de todos los bloques desde el index " + Index);
             Enviar.writeObject(Constantes.REQUEST_BLOCKS_SINCE);
             Enviar.writeObject(Index);
 
             ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
             int loop = (int) Recibir.readObject();
-
+            System.out.println("Ciente:: Recibi la respuesta, tengo " + loop + " bloques pendientes.");
             for (int a = 0; a < loop; a++) {
                 JSONObject Bloque = (JSONObject) Recibir.readObject();
                 if (JSONCreator.validateBlock(Bloque, this.NetManager.getLibraryManager().getBlockChain())) {
-                    System.out.println("Valida el bloque y lo agregue a la lissta en memoria");
+                    System.out.println("Cliente:: Sincronice el bloque con index: " + Bloque.get(Constantes.JSON_INDEX).toString());
                     this.NetManager.getLibraryManager().getBlockChain().AddNode(Bloque, true, false, true);
                 } else {
-                    System.out.println("Bloque corrupto.");
+                    System.out.println("Cliente:: Bloque corrupto (Index: " + Bloque.get(Constantes.JSON_INDEX).toString() + ").");
                 }
             }
-
             requestCloseSocket();
-            JOptionPane.showMessageDialog(Context, "Recibi todos los bloques");
+            JOptionPane.showMessageDialog(Context, "Sincronize todos los bloques");
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -143,26 +181,31 @@ public class Client {
         NodoSimple peer = NetManager.getNetworkList().getHead().getSiguiente();
         int alcance = 0;
         boolean correcto = true;
+        System.out.println("Cliente:: Genere un nuevo bloque, enviandolo a todos los nodos de la red.");
         while (peer != null) {
-            connectTo(peer.getIP(), peer.getServerPort(), Context);
-            try {
-                ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
-                Enviar.writeObject(Constantes.REQUEST_ADDNODE);
-                Enviar.writeObject(Bloque);
+            if (connectTo(peer.getIP(), peer.getServerPort(), Context)) {
+                try {
+                    ObjectOutputStream Enviar = new ObjectOutputStream(Client.getOutputStream());
+                    Enviar.writeObject(Constantes.REQUEST_ADDBLOCK);
+                    Enviar.writeObject(Bloque);
 
-                ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
-                String Respuesta = (String) Recibir.readObject();
-                if (Respuesta.equals(Constantes.REQUEST_ADDNODE_CONFIRMATION)) {
-                    System.out.println("El Peer agrego el nodo");
-                } else {
-                    System.out.println("Un error al agregar el nodo");
-                    correcto = false;
+                    ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
+                    String Respuesta = (String) Recibir.readObject();
+                    if (Respuesta.equals(Constantes.REQUEST_ADDBLOCK_CONFIRMATION)) {
+                        System.out.println("Cliente:: " + peer.getIP() + " valido y agrego el nodo.");
+                    } else {
+                        correcto = false;
+                    }
+                    requestCloseSocket();
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception os) {
+                    System.out.println("Algo paso al enviar el bloque: "+os.getMessage());
                 }
-                requestCloseSocket();
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }else{
+                System.out.println("No pude conectarme a: "+peer.getIP());
             }
             alcance++;
             peer = peer.getSiguiente();
@@ -181,6 +224,8 @@ public class Client {
                 } else {
                     JOptionPane.showMessageDialog(Context, "Sincronize con " + alcance + " nodo de la red.");
                 }
+            } else {
+                JOptionPane.showMessageDialog(Context, "Cliente:: Un nodo reporto el bloque como invalido (Posible sincronizacion requerida)");
             }
         }
     }

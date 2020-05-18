@@ -16,7 +16,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -37,7 +36,7 @@ public class ServerThread extends Thread {
 
     public void run() {
         try {
-            System.out.println("Servidor:: Conexion establecida desde: " + Client.getInetAddress());
+            System.out.println("Hilo/Servidor:: Conexion establecida desde: " + Client.getInetAddress());
 
             while (!Client.isClosed()) {
                 ObjectInputStream Recibir = new ObjectInputStream(Client.getInputStream());
@@ -48,10 +47,18 @@ public class ServerThread extends Thread {
                         Enviar.writeObject(JSONCreator.addRedOperation(JSONCreator.createApartBlock(), NetManager.getNetworkList()).toJSONString());
                         break;
                     case Constantes.REQUEST_ADD_NETWORKNODE:
-                        //Recibir = new ObjectInputStream(Client.getInputStream());
+                        System.out.println("Hilo/Servidor:: Solicitud de Sincronizar un Nuevo Nodo de Red");
                         JSONObject nuevoNodo = (JSONObject) Recibir.readObject();
-                        System.out.println("Solicitud de sincronizar un nuevo nodo");
-                        JSONCreator.parseDataBlock(nuevoNodo.toJSONString(), NetManager, null,null,null, true, null);
+                        JSONCreator.parseDataBlock(nuevoNodo.toJSONString(), NetManager, null,null,null, true, true, null);
+                        Enviar.writeObject(Constantes.REQUEST_ADD_NETWORKNODE_C);
+                        System.out.println("Hilo/Servidor:: Agregue el Nodo de Red Solicitado");
+                        break;
+                    case Constantes.REQUEST_DEL_NETWORKNODE:
+                        System.out.println("Hilo/Servidor:: Solicitud de Eliminar un Nodo de la Red");
+                        JSONObject eliminarNodo = (JSONObject) Recibir.readObject();
+                        JSONCreator.parseDataBlock(eliminarNodo.toJSONString(), NetManager, null,null,null, true, true, null);
+                        Enviar.writeObject(Constantes.REQUEST_DEL_NETWORKNODE_C);
+                        System.out.println("Hilo/Servidor:: Elimine el Nodo de Red Solicitado");
                         break;
                     case Constantes.REQUEST_BLOCKS_SINCE:
                         int Index = (int) Recibir.readObject();
@@ -62,15 +69,18 @@ public class ServerThread extends Thread {
                             Enviar.writeObject(temp.getData());
                             temp = temp.getNext();
                         }
+                        System.out.println("Hilo/Servidor:: Envie todos los bloques desde el index: "+Index+".");
                         break;
-                    case Constantes.REQUEST_ADDNODE:
+                    case Constantes.REQUEST_ADDBLOCK:
                         JSONObject NuevoBloque = (JSONObject) Recibir.readObject();
-                        System.out.println("Solicitud de sincronizar un nuevo bloque");
+                        System.out.println("Hilo/Servidor:: Recibiendo un nuevo bloque.");
                         if (JSONCreator.validateBlock(NuevoBloque, LibraryManager.getBlockChain())) {
-                            System.out.println("El Nuevo Bloque es valido y debo agregarlo");
+                            System.out.println("Hilo/Servidor:: El nuevo bloque es valido, enviando confirmacion.");
+                            Enviar.writeObject(Constantes.REQUEST_ADDBLOCK_CONFIRMATION);
+                            LibraryManager.getBlockChain().AddNode(NuevoBloque, true, false,true);
                         }else{
-                            System.out.println("El nodo esta corrupto, enviando confirmacion de error");
-                            Enviar.writeObject(Constantes.REQUEST_ADDNODE_ERROR);
+                            System.out.println("Hilo/Servidor:: El nodo esta corrupto, enviando confirmacion de error.");
+                            Enviar.writeObject(Constantes.REQUEST_ADDBLOCK_ERROR);
                         }
                         break;
                     case Constantes.REQUEST_CLOSESOCKET:
@@ -78,10 +88,10 @@ public class ServerThread extends Thread {
                         break;
                 }
             }
-            System.out.println("Conexion Perdida.");
+            System.out.println("Hilo/Servidor:: Conexion Perdida.");
             Client.close();
         } catch (SocketException sex) {
-            System.out.println("Conexion Perdida.");
+            System.out.println("Hilo/Servidor:: Conexion Perdida: "+sex.getMessage());
         } catch (IOException ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {

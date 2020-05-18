@@ -19,13 +19,13 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
     /**
      * Creates new form IniciarSesion
      */
-    private CentralGUI Centralgui;
-    private NetworkManager NetManager;
+    private final CentralGUI Centralgui;
+    private final NetworkManager NetManager;
 
     public IniciarSesion(CentralGUI Centralgui) {
         this.Centralgui = Centralgui;
-        NetManager = this.Centralgui.getLibraryManager().getNetworkManager();
-        setName(Constantes.GUI_VENTANA_LOGIN);
+        this.NetManager = this.Centralgui.getLibraryManager().getNetworkManager();
+        super.setName(Constantes.GUI_VENTANA_LOGIN);
         initComponents();
 
     }
@@ -69,6 +69,13 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
             }
         });
 
+        password.setNextFocusableComponent(iniciarsesion);
+        password.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -76,7 +83,6 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(iniciarsesion)
                         .addGroup(layout.createSequentialGroup()
@@ -86,31 +92,38 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(username)
-                                .addComponent(password, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)))))
-                .addContainerGap(31, Short.MAX_VALUE))
+                                .addComponent(password, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))))
+                    .addComponent(jLabel1))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(password, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addComponent(iniciarsesion, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31))
+                    .addComponent(jLabel3)
+                    .addComponent(password, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(11, 11, 11)
+                .addComponent(iniciarsesion, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void iniciarsesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarsesionActionPerformed
+        login();
+    }//GEN-LAST:event_iniciarsesionActionPerformed
+
+    public void login(){
         StringBuilder pass = new StringBuilder();
         pass.append(password.getPassword());
 
@@ -121,16 +134,17 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
                 Centralgui.updateLogStatus();
                 this.dispose();
             } else {
-                System.out.println("Carnet: "+username.getText()+" Password: "+pass);
-                JOptionPane.showMessageDialog(this, "Nombre o clave incorrecta, prueba de nuevo.");
+                System.out.println("Iniciar Sesion:: Error -> Carnet: "+username.getText()+" Password: "+pass);
+                JOptionPane.showMessageDialog(this, "Usuario y/o Password Incorrecto.");
             }
         }else{
             JOptionPane.showMessageDialog(this, "Ingresa un numero de carnet valido.");
         }
-
-
-    }//GEN-LAST:event_iniciarsesionActionPerformed
-
+    }
+    
+    private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
+        login();
+    }//GEN-LAST:event_passwordActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton iniciarsesion;

@@ -14,7 +14,6 @@ import biblioteca.Estructuras.Clave;
 import biblioteca.Estructuras.HashTable;
 import biblioteca.Estructuras.ListaSimple;
 import biblioteca.Estructuras.NodoAVL;
-import biblioteca.Estructuras.NodoB;
 import biblioteca.Estructuras.NodoSimple;
 import biblioteca.Estructuras.SubNodoHash;
 import biblioteca.Libro;
@@ -22,12 +21,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import jdk.jfr.Timestamp;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,6 +38,7 @@ public class JSONCreator {
 
     private static JSONObject prevBlock;
     private static JSONObject CurrentBlock;
+    public static volatile boolean isPrepared;
 
     private JSONCreator() {
     }
@@ -49,6 +47,7 @@ public class JSONCreator {
         CurrentBlock = new JSONObject();
         JSONArray Data = new JSONArray(); //Array de Operaciones - > KeySet
         CurrentBlock.put(Constantes.JSON_DATA_LABEL, Data);
+        isPrepared = false;
         return CurrentBlock;
     }
 
@@ -83,8 +82,8 @@ public class JSONCreator {
         Bloque.put(Constantes.JSON_NONCE, Nonce);
         Bloque.put(Constantes.JSON_PREVIOUSHASH, prevHash);
         Bloque.put(Constantes.JSON_HASH, Hash);
-        System.out.println("Genere el BLoque y el Hash es: " + Hash);
-        System.out.println("Bloque Final: " + Bloque.toJSONString());
+        
+        isPrepared = true;
         return CurrentBlock;
     }
 
@@ -101,11 +100,11 @@ public class JSONCreator {
             if (nuevoHashByMe.equals(NuevoHash)) {
                 return true;
             } else {
-                System.out.println("El HASH que genere no coincide con el del JSON");
+                System.out.println("JSONCreator:: El HASH que genere no coincide con el HASH del JSON");
                 return false;
             }
         } else {
-            System.out.println("El ultimo HASH no coincide.");
+            System.out.println("JSONCreator:: El ultimo HASH no coincide.");
             return false;
         }
     }
@@ -113,11 +112,10 @@ public class JSONCreator {
     public static void completeBlock() {
         prevBlock = CurrentBlock;
         CurrentBlock = createBlock();
-        System.out.println("Se genero un nuevo Blocke en limpio.");
     }
 
     /* Tratamiento de Blockes */
-    public static void parseDataBlock(String JSONString, NetworkManager NetManager, ArbolB LibreroGeneral, ArbolAVL Librero, HashTable Usuarios, boolean LocalJSON, JInternalFrame Context) {
+    public static void parseDataBlock(String JSONString, NetworkManager NetManager, ArbolB LibreroGeneral, ArbolAVL Librero, HashTable Usuarios, boolean LocalJSON, boolean FromPeer, JInternalFrame Context) {
         try {
             JSONParser JParser = new JSONParser();
 
@@ -144,9 +142,10 @@ public class JSONCreator {
                                 JSONObject servidorRemoto = (JSONObject) nodo;
                                 NetManager.getNetworkList().deleteNetNode(servidorRemoto.get(Constantes.JSON_RED_NODO_IP).toString());
                             }
-                            if (NetManager.getNetworkList().getNodeSize() == 1) {
+                            if (NetManager.getNetworkList().getNodeSize() < 2) {
                                 NetManager.setUniqueNodeFlag();
                             }
+                            break;
                         case Constantes.JSON_USUARIOS_ADD:
                             JSONArray AddUser = (JSONArray) operacion.get(ID);
                             for (Object nodo : AddUser) {
@@ -157,7 +156,7 @@ public class JSONCreator {
                                         usuario.get(Constantes.JSON_USER_APELLIDO).toString(),
                                         usuario.get(Constantes.JSON_USER_CARRERA).toString(),
                                         usuario.get(Constantes.JSON_USER_PASSWORD).toString(),
-                                        LocalJSON);
+                                        LocalJSON, FromPeer);
                             }
                             break;
                         case Constantes.JSON_USUARIOS_EDIT:
@@ -178,6 +177,14 @@ public class JSONCreator {
                             for (Object nodo : DelUser) {
                                 JSONObject usuario = (JSONObject) nodo;
                                 Usuarios.delUser(Integer.parseInt(usuario.get(Constantes.JSON_USER_CARNET).toString()), LocalJSON);
+                            }
+                            break;
+                        case Constantes.JSON_CATEGORY_ADD:
+                            JSONArray AddCat = (JSONArray) operacion.get(ID);
+                            for (Object nodo : AddCat) {
+                                JSONObject categoria = (JSONObject) nodo;
+                                Categoria nuevo = new Categoria(categoria.get(Constantes.JSON_CATEGORY_NAME).toString(), Integer.parseInt(categoria.get(Constantes.JSON_CATEGORY_AUTHOR_ID).toString()));
+                                Librero.InsertNew(nuevo, LocalJSON);
                             }
                             break;
                         case Constantes.JSON_CATEGORY_DELETE:
@@ -205,8 +212,8 @@ public class JSONCreator {
                                 Clave libro_general = LibreroGeneral.NewBook(nuevo_libro, true);
 
                                 if (libro_general != null) {
-                                    NodoAVL categoria = Librero.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), Integer.parseInt(libro.get(Constantes.JSON_BOOK_ID_PUBLISHER).toString()), LocalJSON);
-                                    categoria.getData().getLibrero().NewBook(nuevo_libro, LocalJSON);
+                                    Categoria categoria = Librero.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), Integer.parseInt(libro.get(Constantes.JSON_BOOK_ID_PUBLISHER).toString()), LocalJSON);
+                                    categoria.getLibrero().NewBook(nuevo_libro, LocalJSON);
                                 }
                             }
                             break;
@@ -245,7 +252,7 @@ public class JSONCreator {
                             }
                             break;
                         default:
-                            System.out.println("Llave no identificada: " + (String) ID);
+                            //System.out.println("Llave no identificada: " + (String) ID);
                             break;
                     }
                 }
@@ -267,7 +274,7 @@ public class JSONCreator {
                     usuario.get(Constantes.JSON_USER_APELLIDO).toString(),
                     usuario.get(Constantes.JSON_USER_CARRERA).toString(),
                     usuario.get(Constantes.JSON_USER_PASSWORD).toString(),
-                    false);
+                    false, false);
             if (nuevo != null) {
                 addser++;
             } else {
@@ -302,8 +309,8 @@ public class JSONCreator {
             Clave libro_general = GeneralLibrary.NewBook(nuevo_libro, true);
 
             if (libro_general != null) {
-                NodoAVL categoria = CatLibrary.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), NetManager.getLoggedUser().getCarnet(), false);
-                categoria.getData().getLibrero().NewBook(nuevo_libro, false);
+                Categoria categoria = CatLibrary.BuscarYCrear(libro.get(Constantes.JSON_BOOK_CATEGORY).toString(), NetManager.getLoggedUser().getCarnet(), false);
+                categoria.getLibrero().NewBook(nuevo_libro, false);
                 addbk++;
             } else {
                 misbk++;
@@ -369,7 +376,7 @@ public class JSONCreator {
     public static JSONObject addUserOperation(JSONObject Bloque, SubNodoHash Usuario) {
         JSONObject Operacion = new JSONObject();
         JSONArray addUser = new JSONArray();
-        System.out.println("Agregue un usuario a la operacion: " + Usuario.getNombre());
+        System.out.println("JSONCreator:: Agregue una Operacion de crear usuario: "+Usuario.getNombre());
         JSONObject User = new JSONObject();
         User.put(Constantes.JSON_USER_CARNET, Usuario.getCarnet());
         User.put(Constantes.JSON_USER_NOMBRE, Usuario.getNombre());
@@ -380,13 +387,14 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_USUARIOS_ADD, addUser);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
     
     public static JSONObject editUserOperation(JSONObject Bloque, SubNodoHash Usuario) {
         JSONObject Operacion = new JSONObject();
         JSONArray editUser = new JSONArray();
-        System.out.println("Edite un usuario a la operacion: " + Usuario.getNombre());
+        System.out.println("JSONCreator:: Agregue una Operacion de editar usuario: "+Usuario.getNombre());
         JSONObject User = new JSONObject();
         User.put(Constantes.JSON_USER_CARNET, Usuario.getCarnet());
         User.put(Constantes.JSON_USER_NOMBRE, Usuario.getNombre());
@@ -397,6 +405,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_USUARIOS_EDIT, editUser);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -410,6 +419,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_USUARIOS_DELETE, addUser);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -418,7 +428,7 @@ public class JSONCreator {
         JSONObject Operacion = new JSONObject();
         JSONArray addCategory = new JSONArray();
 
-        System.out.println("Agregue una adicion categoria a la operacion: " + categoria.getNombre());
+        System.out.println("JSONCreator:: Agregue una Operacion de crear categoria: "+categoria.getNombre());
         JSONObject Cat = new JSONObject();
         Cat.put(Constantes.JSON_CATEGORY_NAME, categoria.getNombre());
         Cat.put(Constantes.JSON_CATEGORY_AUTHOR_ID, categoria.getPublisher());
@@ -426,6 +436,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_CATEGORY_ADD, addCategory);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -433,13 +444,14 @@ public class JSONCreator {
         JSONObject Operacion = new JSONObject();
         JSONArray addCategory = new JSONArray();
 
-        System.out.println("Agregue una eliminacion categoria a la operacion: " + categoria.getNombre());
+        System.out.println("JSONCreator:: Agregue una Operacion de eliminar categoria: "+categoria.getNombre());
         JSONObject Cat = new JSONObject();
         Cat.put(Constantes.JSON_CATEGORY_NAME, categoria.getNombre());
         addCategory.add(Cat);
 
         Operacion.put(Constantes.JSON_CATEGORY_DELETE, addCategory);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -448,7 +460,7 @@ public class JSONCreator {
         JSONObject Operacion = new JSONObject();
         JSONArray addBook = new JSONArray();
 
-        System.out.println("Agregue una adicion de libro a la operacion: " + libro.getTitle());
+        System.out.println("JSONCreator:: Agregue una Operacion de crear libro: "+libro.getTitle());
         JSONObject Book = new JSONObject();
         Book.put(Constantes.JSON_BOOK_ISBN, libro.getISBN());
         Book.put(Constantes.JSON_BOOK_YEAR, libro.getYear());
@@ -463,6 +475,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_BOOKS_ADD, addBook);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
     
@@ -470,8 +483,9 @@ public class JSONCreator {
         JSONObject Operacion = new JSONObject();
         JSONArray addBook = new JSONArray();
 
-        System.out.println("Agregue una edicion de libro a la operacion: " + libro.getTitle());
+        System.out.println("JSONCreator:: Agregue una Operacion de editar libro: "+libro.getTitle());
         JSONObject Book = new JSONObject();
+        Book.put(Constantes.JSON_BOOK_ISBN, libro.getISBN());
         Book.put(Constantes.JSON_BOOK_YEAR, libro.getYear());
         Book.put(Constantes.JSON_BOOK_LANG, libro.getLanguage());
         Book.put(Constantes.JSON_BOOK_TITLE, libro.getTitle());
@@ -483,6 +497,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_BOOKS_EDIT, addBook);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -490,7 +505,7 @@ public class JSONCreator {
         JSONObject Operacion = new JSONObject();
         JSONArray delBook = new JSONArray();
 
-        System.out.println("Agregue una eliminacion de libro a la operacion: " + libro.getTitle());
+        System.out.println("JSONCreator:: Agregue una Operacion de eliminar libro: "+libro.getTitle());
         JSONObject Book = new JSONObject();
         Book.put(Constantes.JSON_BOOK_ISBN, libro.getISBN());
         Book.put(Constantes.JSON_BOOK_TITLE, libro.getTitle());
@@ -500,6 +515,7 @@ public class JSONCreator {
 
         Operacion.put(Constantes.JSON_BOOKS_DELETE, delBook);
         ((JSONArray) Bloque.get(Constantes.JSON_DATA_LABEL)).add(Operacion);
+        isPrepared = false;
         return Bloque;
     }
 
@@ -546,7 +562,7 @@ public class JSONCreator {
 
     public static int NonceCalc(String newNodeString) {
         int NONCE = 0;
-        System.out.println("Looking for NONCE");
+        System.out.println("JSONCreator:: Calculado el NONCE");
         while (true) {
             //System.out.println("Testing with NONCE: "+NONCE);
             String candidate = getSha256of(newNodeString + String.valueOf(NONCE));
@@ -555,6 +571,7 @@ public class JSONCreator {
             }
             NONCE++;
         }
+        System.out.println("JSONCreator:: NONCE calculado con exito: "+NONCE);
         return NONCE;
     }
 

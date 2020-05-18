@@ -273,77 +273,83 @@ public class verLibro extends javax.swing.JInternalFrame {
 
     private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
         if (this.Centralgui.getLibraryManager().getNetworkManager().getLoggedUser() != null) {
-            if (this.Libro.getIDAuthor() == this.Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getCarnet()) {
-                String Mensaje = "";
-                if (this.Titulo.getText() == "" || this.Titulo.getText().matches("[\\s]+")) {
-                    Mensaje = Mensaje = "Titulo vacio o invalido.\n";
-                }
+            if (!this.Libro.isDeleted()) {
+                if (this.Libro.getIDAuthor() == this.Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getCarnet()) {
+                    String Mensaje = "";
+                    if (this.Titulo.getText() == "" || this.Titulo.getText().matches("[\\s]+")) {
+                        Mensaje = Mensaje = "Titulo vacio o invalido.\n";
+                    }
 
-                if (this.Autor.getText() == "" || this.Autor.getText().matches("[\\s]+")) {
-                    Mensaje = Mensaje = "Autor vacio o invalido.\n";
-                }
+                    if (this.Autor.getText() == "" || this.Autor.getText().matches("[\\s]+")) {
+                        Mensaje = Mensaje = "Autor vacio o invalido.\n";
+                    }
 
-                if (this.Editorial.getText() == "" || this.Editorial.getText().matches("[\\s]+")) {
-                    Mensaje = Mensaje = "Editorial vacia o invalida.\n";
-                }
+                    if (this.Editorial.getText() == "" || this.Editorial.getText().matches("[\\s]+")) {
+                        Mensaje = Mensaje = "Editorial vacia o invalida.\n";
+                    }
 
-                if (!this.Ano.getText().matches("[0-9]+")) {
-                    Mensaje = Mensaje = "Año vacio o invalido.\n";
-                }
+                    if (!this.Ano.getText().matches("[0-9]+")) {
+                        Mensaje = Mensaje = "Año vacio o invalido.\n";
+                    }
 
-                if (!this.Edicion.getText().matches("[0-9]+")) {
-                    Mensaje = Mensaje = "Edicion vacia o invalida.\n";
-                }
+                    if (!this.Edicion.getText().matches("[0-9]+")) {
+                        Mensaje = Mensaje = "Edicion vacia o invalida.\n";
+                    }
 
-                if (this.Idioma.getText() == "" || this.Idioma.getText().matches("[\\s]+")) {
-                    Mensaje = Mensaje = "Idioma vacio o invalido.\n";
-                }
+                    if (this.Idioma.getText() == "" || this.Idioma.getText().matches("[\\s]+")) {
+                        Mensaje = Mensaje = "Idioma vacio o invalido.\n";
+                    }
 
-                if (Mensaje != "") {
-                    JOptionPane.showMessageDialog(this, Mensaje);
+                    if (Mensaje != "") {
+                        JOptionPane.showMessageDialog(this, Mensaje);
+                    } else {
+                        /* Detectar Cambios */
+                        boolean sinCambios = true;
+
+                        if (!this.Libro.getAuthor().equals(this.Autor.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (this.Libro.getEdition() != Integer.parseInt(this.Edicion.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (!this.Libro.getLanguage().equals(this.Idioma.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (!this.Libro.getPrinter().equals(this.Editorial.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (!this.Libro.getTitle().equals(this.Titulo.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (this.Libro.getYear() != Integer.parseInt(this.Ano.getText())) {
+                            sinCambios = false;
+                        }
+
+                        if (!sinCambios) {
+                            this.Libro.setAuthor(this.Autor.getText());
+                            this.Libro.setEdition(Integer.parseInt(this.Edicion.getText()));
+                            this.Libro.setLanguage(this.Idioma.getText());
+                            this.Libro.setPrinter(this.Editorial.getText());
+                            this.Libro.setTitle(this.Titulo.getText());
+                            this.Libro.setYear(Integer.parseInt(this.Ano.getText()));
+                            Centralgui.getLibraryManager().getBlockChain().setPendingChange(true);
+                            JOptionPane.showMessageDialog(this, "Libro actualizado");
+
+                            /* Agregar Operacion al Bloque */
+                            JSONCreator.editBookOperation(JSONCreator.getCurrentBlock(), this.Libro);
+                        }
+                    }
                 } else {
-                    /* Detectar Cambios */
-                    boolean sinCambios = true;
-                    
-                    if(!this.Libro.getAuthor().equals(this.Autor.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(this.Libro.getEdition() != Integer.parseInt(this.Edicion.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(!this.Libro.getLanguage().equals(this.Idioma.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(!this.Libro.getPrinter().equals(this.Editorial.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(!this.Libro.getTitle().equals(this.Titulo.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(this.Libro.getYear() != Integer.parseInt(this.Ano.getText())){
-                        sinCambios = false;
-                    }
-                    
-                    if(!sinCambios){
-                        this.Libro.setAuthor(this.Autor.getText());
-                        this.Libro.setEdition(Integer.parseInt(this.Edicion.getText()));
-                        this.Libro.setLanguage(this.Idioma.getText());
-                        this.Libro.setPrinter(this.Editorial.getText());
-                        this.Libro.setTitle(this.Titulo.getText());
-                        this.Libro.setYear(Integer.parseInt(this.Ano.getText()));
-                        JOptionPane.showMessageDialog(this, "Libro actualizado");
-                        
-                        /* Agregar Operacion al Bloque */
-                        JSONCreator.editBookOperation(JSONCreator.getCurrentBlock(), this.Libro);
-                    }
+                    JOptionPane.showMessageDialog(this, "Este libro no te pertenece");
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Este libro no te pertenece");
+                JOptionPane.showMessageDialog(this, "Este libro ya no existe.");
+                this.dispose();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Debes iniciar sesion.");

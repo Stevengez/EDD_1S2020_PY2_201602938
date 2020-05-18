@@ -71,7 +71,7 @@ public class NodoB {
                         /* Reconectar */
                         Clave2.setMenores(Clave1.getMayores());
                     }else{
-                        System.out.println("Esa clave ya existe.");
+                        //System.out.println("Esa clave ya existe.");
                     }
                     this.NumeroClaves = 2;
                     break;
@@ -158,7 +158,7 @@ public class NodoB {
                     this.NumeroClaves = 5;
                     break;
                 default:
-                    System.out.println("La cantidad de claves no coinciden.");
+                    System.out.println("ArbolB:: La cantidad de claves no coinciden.");
                     break;
             }
 
@@ -167,22 +167,22 @@ public class NodoB {
     
     public void deleteKey(Clave clave){
         if(Clave1==clave){
-            System.out.println("Borre la clave 1");
+            //System.out.println("Borre la clave 1");
             Clave1 = Clave2;
             Clave2 = Clave3;
             Clave3 = Clave4;
             Clave4 = null;
         }else if(Clave2 == clave){
-            System.out.println("Borre la clave 2");
+            //System.out.println("Borre la clave 2");
             Clave2 = Clave3;
             Clave3 = Clave4;
             Clave4 = null;
         }else if(Clave3 == clave){
-            System.out.println("Borre la clave 3");
+            //System.out.println("Borre la clave 3");
             Clave3 = Clave4;
             Clave4 = null;
         }else{
-            System.out.println("Borre la clave 4");
+            //System.out.println("Borre la clave 4");
             Clave4 = null;
         }
     }

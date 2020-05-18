@@ -9,8 +9,6 @@ import JSONCreator.Constantes;
 import JSONCreator.JSONCreator;
 import Network.Client;
 import Network.NetworkManager;
-import biblioteca.Estructuras.ArbolAVL;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -50,25 +48,25 @@ public class Settings extends javax.swing.JInternalFrame {
         this.Centralgui = Centralgui;
         IPs = new ArrayList();
         initComponents();
-        if(!Centralgui.getBootUpFlag()){
+        if (!Centralgui.getBootUpFlag()) {
             loadDefault();
             Centralgui.setBootUpFlag();
         }
         InterfazSelector();
         placeValues();
-        
+
     }
 
-    public void InterfazSelector(){
+    public void InterfazSelector() {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while(interfaces.hasMoreElements()){
+            while (interfaces.hasMoreElements()) {
                 NetworkInterface interfaz = interfaces.nextElement();
                 Enumeration<InetAddress> direcciones = interfaz.getInetAddresses();
-                while(direcciones.hasMoreElements()){
+                while (direcciones.hasMoreElements()) {
                     InetAddress ip = direcciones.nextElement();
-                    if(ip.getHostAddress().matches("[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?") && !ip.getHostAddress().matches("127\\.0\\.0\\.1|0\\.0\\.0\\.0")){
-                        Interfaces.addItem(interfaz.getDisplayName()+" : "+ip.getHostAddress());
+                    if (ip.getHostAddress().matches("[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?") && !ip.getHostAddress().matches("127\\.0\\.0\\.1|0\\.0\\.0\\.0")) {
+                        Interfaces.addItem(interfaz.getDisplayName() + " : " + ip.getHostAddress());
                         IPs.add(ip.getHostAddress());
                     }
                 }
@@ -76,9 +74,9 @@ public class Settings extends javax.swing.JInternalFrame {
         } catch (SocketException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -127,9 +125,10 @@ public class Settings extends javax.swing.JInternalFrame {
         jLabel3.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel3.setText("Puerto Cliente Local (Origen de las Solicitudes) :");
 
-        ClientPortInput.setFont(new java.awt.Font("Calibri", 0, 16)); // NOI18N
+        ClientPortInput.setEditable(false);
+        ClientPortInput.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         ClientPortInput.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        ClientPortInput.setText("8530");
+        ClientPortInput.setText("System Select");
 
         jLabel4.setText("IP para Sincronizacion:");
 
@@ -183,28 +182,27 @@ public class Settings extends javax.swing.JInternalFrame {
                         .addComponent(PortSyncInput, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel6)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(Interfaces, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel1)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel3)
-                                            .addComponent(jLabel2))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(ServerPortInput, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(ClientPortInput, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(Interfaces, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel1)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGap(0, 0, Short.MAX_VALUE))))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel2))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(ServerPortInput, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(ClientPortInput, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -217,9 +215,11 @@ public class Settings extends javax.swing.JInternalFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ServerPortInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ClientPortInput))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(ClientPortInput)
+                        .addGap(2, 2, 2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -247,20 +247,20 @@ public class Settings extends javax.swing.JInternalFrame {
         IPSyncInput.setText(NetManager.getSyncHostName());
         PortSyncInput.setText(String.valueOf(NetManager.getSyncPort()));
         Centralgui.updateLogStatus();
-        if(NetManager.getUniqueNodeFlag()){
+        if (NetManager.getSyncHostName().matches("(localhost)|(" + IPs.get(Interfaces.getSelectedIndex()) + ")|(0.0.0.0)|(127.0.0.1)")) {
             this.hide();
         }
         EnableInterfazChange();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public void EnableInterfazChange(){
-        if(NetManager.getServerStatus()){
+    public void EnableInterfazChange() {
+        if (NetManager.getServerStatus()) {
             Interfaces.setEnabled(false);
-        }else{
-            Interfaces.setEnabled(true);   
+        } else {
+            Interfaces.setEnabled(true);
         }
     }
-    
+
     //Save Button
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         Guardar();
@@ -268,16 +268,17 @@ public class Settings extends javax.swing.JInternalFrame {
         this.hide();
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    public void Guardar(){
+    public void Guardar() {
         String errores = "";
         if (!ServerPortInput.getText().matches("[0-9]+")) {
             errores = errores + "El Puerto del Servidor es invalido o esta vacio.\n";
         }
 
+        /*
         if (!ClientPortInput.getText().matches("[0-9]+")) {
             errores = errores + "El Puerto del Cliente es invalido o esta vacio.\n";
         }
-
+         */
         if (!IPSyncInput.getText().matches("([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)|localhost|LOCALHOST|Localhost|LocalHost")) {
             errores = errores + "La Direccion IP de sincronizacion esta incorrecta.\n";
         }
@@ -290,65 +291,58 @@ public class Settings extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, errores);
         } else {
             NetManager.setServerPort(Integer.parseInt(ServerPortInput.getText()));
-            NetManager.setClientPort(Integer.parseInt(ClientPortInput.getText()));
+            //NetManager.setClientPort(Integer.parseInt(ClientPortInput.getText()));
             NetManager.registerMySelf(IPs.get(Interfaces.getSelectedIndex()));
             NetManager.saveToConfigFile();
         }
     }
-    
+
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         Guardar();
-        if (NetManager.isUnicoNodo()) {
-            JOptionPane.showMessageDialog(this, "No hace falta sincroizar porque eres el unico Nodo de la red.");
+        if (IPSyncInput.getText().matches("localhost|LocalHost|Localhost|LOCALHOST|(127\\.0\\.0\\.1|)") || IPSyncInput.getText().matches(IPs.get(Interfaces.getSelectedIndex()))) {
+            JOptionPane.showMessageDialog(this, "No te puedes sincronizar contigo mismo");
         } else {
-            if (IPSyncInput.getText().matches("localhost|LocalHost|Localhost|LOCALHOST|(127\\.0\\.0\\.1|)") || IPSyncInput.getText().matches(IPs.get(Interfaces.getSelectedIndex()))) {
-                JOptionPane.showMessageDialog(this, "No te puedes sincronizar contigo mismo");
-            } else {
-                String errores = "";
-                if (!IPSyncInput.getText().matches("([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)|localhost|LOCALHOST|Localhost|LocalHost")) {
-                    errores = errores + "La Direccion IP de sincronizacion esta incorrecta.\n";
-                }
-
-                if (!PortSyncInput.getText().matches("[0-9]+")) {
-                    errores = errores + "El Puerto de sincronizacion es invalido o esta vacio.\n";
-                }
-
-                if (!errores.equals("")) {
-                    JOptionPane.showMessageDialog(this, errores);
-                }else{
-                    if(NetManager.getClient().connectTo(IPSyncInput.getText(),Integer.parseInt(PortSyncInput.getText()), this)){
-                        
-                        /* Manejar Nodos de la Red */
-                        
-                        String Respuesta = NetManager.getClient().requestNetworkNodes();
-                        NetManager.getClient().requestCloseSocket();
-                        JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, null, false, this);
-                        
-                        /* Registrarse en todos los nodos de la red */
-                        
-                        NetManager.getClient().requestAddNetworkNode(this);
-                        
-                        
-                        /* Solicitar todos los blockes pendientes */
-                        
-                        if(NetManager.getClient().connectTo(IPSyncInput.getText(),Integer.parseInt(PortSyncInput.getText()), this)){
-                            NetManager.getClient().requestBlockSince(NetManager.getLibraryManager().getBlockChain().getNextIndex(),this);
-                        }
-                        
-                        /* Estado Sincronizado */
-                        
-                        NetManager.setSyncFlag();
-                        Centralgui.updateLogStatus();
-                        
-                        JOptionPane.showMessageDialog(this, "Sincronizacion Completa");
-                        this.hide();
-                        
-                    }else{
-                        System.out.println("No se pudo conectar");
-                    }
-                }
-
+            String errores = "";
+            if (!IPSyncInput.getText().matches("([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)|localhost|LOCALHOST|Localhost|LocalHost")) {
+                errores = errores + "La Direccion IP de sincronizacion esta incorrecta.\n";
             }
+
+            if (!PortSyncInput.getText().matches("[0-9]+")) {
+                errores = errores + "El Puerto de sincronizacion es invalido o esta vacio.\n";
+            }
+
+            if (!errores.equals("")) {
+                JOptionPane.showMessageDialog(this, errores);
+            } else {
+                if (NetManager.getClient().connectTo(IPSyncInput.getText(), Integer.parseInt(PortSyncInput.getText()), this)) {
+
+                    /* Manejar Nodos de la Red */
+                    String Respuesta = NetManager.getClient().requestNetworkNodes();
+                    NetManager.getClient().requestCloseSocket();
+                    JSONCreator.parseDataBlock(Respuesta, NetManager, null, null, null, false, false, this);
+
+                    /* Registrarse en todos los nodos de la red */
+                    NetManager.getClient().requestAddNetworkNode(this);
+
+                    /* Solicitar todos los blockes pendientes */
+                    if (NetManager.getClient().connectTo(IPSyncInput.getText(), Integer.parseInt(PortSyncInput.getText()), this)) {
+                        NetManager.getClient().requestBlockSince(NetManager.getLibraryManager().getBlockChain().getNextIndex(), this);
+                    }
+
+                    /* Estado Sincronizado */
+                    NetManager.setSyncFlag();
+                    Centralgui.updateLogStatus();
+
+                    JOptionPane.showMessageDialog(this, "Sincronizacion Completa");
+                    this.hide();
+                    NetManager.createServerBroadCast();
+                    NetManager.createServer();
+                    NetManager.getClient();
+                } else {
+                    System.out.println("No se pudo conectar");
+                }
+            }
+
         }
         EnableInterfazChange();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -371,22 +365,19 @@ public class Settings extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     // End of variables declaration//GEN-END:variables
 
-    
     private void loadDefault() {
         Path currentDir = Paths.get("").toAbsolutePath();
-        System.out.println("Current dir is: " + currentDir);
 
         File defaultsettings = new File(currentDir + "\\Config\\", "Settings.json");
 
         if (defaultsettings.exists()) {
-            System.out.println("Existe");
             FileReader fileReader;
             JSONParser jsonParser = new JSONParser();
             try {
                 FileReader reader = new FileReader(currentDir + "\\Config\\Settings.json");
                 JSONParser jparser = new JSONParser();
                 JSONObject Red = (JSONObject) jparser.parse(reader);
-                JSONArray Datos = (JSONArray) Red.get("RED");
+                JSONArray Datos = (JSONArray) Red.get(Constantes.JSON_RED_LABEL);
 
                 for (Object actual : Datos) {
                     NetManager.setServerPort(Integer.parseInt(((JSONObject) actual).get(Constantes.RED_SERVER_PORT).toString()));
@@ -424,7 +415,7 @@ public class Settings extends javax.swing.JInternalFrame {
 
     private void placeValues() {
         ServerPortInput.setText(String.valueOf(NetManager.getServerPort()));
-        ClientPortInput.setText(String.valueOf(NetManager.getClientPort()));
+        ClientPortInput.setText("System Select");
         IPSyncInput.setText(NetManager.getSyncHostName());
         PortSyncInput.setText(String.valueOf(NetManager.getSyncPort()));
     }

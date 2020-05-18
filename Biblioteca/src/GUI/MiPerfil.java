@@ -26,7 +26,7 @@ public class MiPerfil extends javax.swing.JInternalFrame {
     public MiPerfil(CentralGUI Centralgui, JInternalFrame Biblioteca) {
         this.Centralgui = Centralgui;
         this.MiBiblioteca = Biblioteca;
-        setName(Constantes.GUI_VENTANA_MI_CUENTA);
+        setName(Constantes.GUI_VENTANA_MYPROFILE);
         initComponents();
         this.jLabel1.setText("Hola, "+Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getNombre());
         placeValues();
@@ -61,6 +61,7 @@ public class MiPerfil extends javax.swing.JInternalFrame {
         jLabel4.setText("Apellido :");
 
         setClosable(true);
+        setTitle("Administracion de la cuenta");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -195,6 +196,7 @@ public class MiPerfil extends javax.swing.JInternalFrame {
             if (Integer.parseInt(this.Carnet.getText()) == Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getCarnet()) {
                 SubNodoHash Yo = Centralgui.getLibraryManager().getUsuarios().getUser(Centralgui.getLibraryManager().getNetworkManager().getLoggedUser().getCarnet());
                 boolean sinCambios = true;
+                boolean passSinCambios = true;
 
                 if (!this.Nombre.getText().equals(Yo.getNombre())) {
                     sinCambios = false;
@@ -213,13 +215,18 @@ public class MiPerfil extends javax.swing.JInternalFrame {
 
                 if (!pass.toString().equals(Yo.getPassword())) {
                     sinCambios = false;
+                    passSinCambios = false;
                 }
 
                 if (!sinCambios) {
                     Yo.setNombre(this.Nombre.getText());
                     Yo.setApellido(this.Apellido.getText());
                     Yo.setCarrera(this.Carrera.getText());
-                    Yo.setPassword(JSONCreator.getMD5From(pass.toString()));
+                    if(!passSinCambios){
+                        Yo.setPassword(JSONCreator.getMD5From(pass.toString()));
+                    }else{
+                        Yo.setPassword(pass.toString());
+                    }                    
                     JOptionPane.showMessageDialog(this, "Usuario Actualizado");
                     this.dispose();
 
