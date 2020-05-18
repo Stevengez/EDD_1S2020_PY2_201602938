@@ -1,32 +1,24 @@
-========================
-BUILD OUTPUT DESCRIPTION
-========================
+* La biblioteca virtual crea una red P2P (Peer to peer):
+	Para mantenerla actualizada utiliza el concepto basico de blockchain (prueba de trabajo)
+	por lo que cada bloque debe validarse con una combinacion de datos propios del bloque
+	generando una cadena sha256 on 0000 al inicio.
 
-When you build an Java application project that has a main class, the IDE
-automatically copies all of the JAR
-files on the projects classpath to your projects dist/lib folder. The IDE
-also adds each of the JAR files to the Class-Path element in the application
-JAR files manifest file (MANIFEST.MF).
-
-To run the project from the command line, go to the dist folder and
-type the following:
-
-java -jar "Biblioteca.jar" 
-
-To distribute this project, zip up the dist folder (including the lib folder)
-and distribute the ZIP file.
-
-Notes:
-
-* If two JAR files on the project classpath have the same name, only the first
-JAR file is copied to the lib folder.
-* Only JAR files are copied to the lib folder.
-If the classpath contains other types of files or folders, these files (folders)
-are not copied.
-* If a library on the projects classpath also has a Class-Path element
-specified in the manifest,the content of the Class-Path element has to be on
-the projects runtime path.
-* To set a main class in a standard Java project, right-click the project node
-in the Projects window and choose Properties. Then click Run and enter the
-class name in the Main Class field. Alternatively, you can manually type the
-class name in the manifest Main-Class element.
+	* Modulos: 
+		* Carga masiva de usuarios
+		* Carga masiva de libros
+		* Creacion manual de libros
+		* Creacion manual de usuarios
+		* Creacion manual de categorias
+		* Biblioteca Virtual (Global y Personal)
+			* Mi Cuenta
+				* Modificar Usuario
+				* Eliminar Usuario
+			* Busqueda por Nombre/ISBN
+		* Reportes
+			* Reporte grafico de las categorias
+			* Reporte grafico de la biblioteca (Libros)
+			* Reporte grafico de los usuarios
+			* Reporte grafico de los nodos de la red
+			* Reporte grafico de los bloques actuales
+		* Sincronizacion de bloques
+		* Configuracion (Permite configurar puertos y elegir un nodo de sincronizacion)
